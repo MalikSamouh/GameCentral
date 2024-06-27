@@ -1,1 +1,2 @@
-# GameCentral
+# GameCentral Overview
+Welcome to GameCentral, your one-stop digital storefront for all your favorite video games. GameCentral provides a seamless and interactive platform for gamers to explore, purchase, and manage their digital game library. This project involves designing, implementing, testing, and deploying a web application that supports both Customers and Administrators to interact with the e-store efficiently.
