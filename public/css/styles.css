@@ -85,7 +85,7 @@ body {
   .homepageTitle {
     font-weight: 700;
     font-size: 2rem;
-    margin-left: 5rem;
+    margin-left: 1rem;
     margin-top: 3rem;
     margin-bottom: 2rem;
   }
@@ -97,10 +97,8 @@ body {
     .filters {
       width: 10rem;
       margin-right: 4rem;
-      background-color: lightgray;
       div {
-        padding: 4rem 0 4rem 1rem;
-        
+        padding: 2rem 0 2rem 1rem;
       }
     }
 
@@ -109,9 +107,47 @@ body {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
       gap: 10px;
+      height: 4rem;
+      img {
+        height: fit-content;
+        
+      }
+      div {
+        padding: 1rem 0 4rem 1rem;
+      }
+      .gameDesc {
+        padding: 0;
+        div {
+          font-size: 0.8rem;
+          padding: 0;
+        }
+        .gameName {
+          font-weight: 700;
+        }
+        .gamePrice {
+          font-weight: 700;
+          margin-top: 0.7rem;
+        }
+      }
     }
-
     .gamePic {
       width: 10rem;
     }
+  }
+
+  .shoppingButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+    padding: 0 1rem;
+    border: none;
+    border-radius: 1.2rem;
+    background-color: #ff0000;
+    color: white;
+    cursor: pointer;
+  }
+
+  .shoppingButton:hover {
+    background-color: #ff5500;
   }

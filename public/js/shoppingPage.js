@@ -3,61 +3,43 @@ const gameList = [
     {
         gameName: 'testName1',
         publisher: 'testPublisher1',
-        price: 'testPrice1',
+        price: '19.99',
         pic: '../public/images/FlagofCanada.png',
     },
     {
         gameName: 'testName1',
         publisher: 'testPublisher1',
-        price: 'testPrice1',
+        price: '19.99',
         pic: '../public/images/FlagofCanada.png',
     },
     {
         gameName: 'testName1',
         publisher: 'testPublisher1',
-        price: 'testPrice1',
+        price: '19.99',
         pic: '../public/images/FlagofCanada.png',
     },
     {
         gameName: 'testName1',
         publisher: 'testPublisher1',
-        price: 'testPrice1',
+        price: '19.99',
         pic: '../public/images/FlagofCanada.png',
     },
     {
         gameName: 'testName1',
         publisher: 'testPublisher1',
-        price: 'testPrice1',
+        price: '19.99',
         pic: '../public/images/FlagofCanada.png',
     },
     {
         gameName: 'testName1',
         publisher: 'testPublisher1',
-        price: 'testPrice1',
+        price: '19.99',
         pic: '../public/images/FlagofCanada.png',
     },
     {
         gameName: 'testName1',
         publisher: 'testPublisher1',
-        price: 'testPrice1',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'testPublisher1',
-        price: 'testPrice1',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'testPublisher1',
-        price: 'testPrice1',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'testPublisher1',
-        price: 'testPrice1',
+        price: '19.99',
         pic: '../public/images/FlagofCanada.png',
     },
 ];
@@ -106,8 +88,21 @@ document.addEventListener('DOMContentLoaded', () => {
         gamesImage.src = game.pic;
         gamesImage.className = 'gamePic';
         gamesDiv.appendChild(gamesImage);
+
         const gamesDesc = document.createElement('div');
-        gamesDesc.textContent = game.gameName;
+        gamesDesc.className = 'gameDesc'
+        const gameName = document.createElement('div');
+        gameName.className = 'gameName';
+        gameName.textContent = game.gameName;
+        gamesDesc.appendChild(gameName);
+        const gamePublisher = document.createElement('div');
+        gamePublisher.textContent = game.publisher;
+        gamesDesc.appendChild(gamePublisher);
+        const gamePrice = document.createElement('div');
+        gamePrice.textContent = '$' + game.price;
+        gamePrice.className = 'gamePrice';
+        gamesDesc.appendChild(gamePrice);
+
         gamesDiv.appendChild(gamesDesc);
         gamesContainer.appendChild(gamesDiv);
     });
