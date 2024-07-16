@@ -115,22 +115,29 @@ const loadGamesContainer = (displayedGames) => {
         gamesDiv.appendChild(gamesImage);
 
         const gamesDesc = document.createElement('div');
-        gamesDesc.className = 'gameDesc'
+        gamesDesc.className = 'gameDesc';
         const gameName = document.createElement('div');
         gameName.className = 'gameName';
         gameName.textContent = game.gameName;
         gamesDesc.appendChild(gameName);
+
         const gamePublisher = document.createElement('div');
         gamePublisher.textContent = game.publisher;
         gamesDesc.appendChild(gamePublisher);
+
         const gamePrice = document.createElement('div');
         gamePrice.textContent = '$' + game.price;
         gamePrice.className = 'gamePrice';
         gamesDesc.appendChild(gamePrice);
+
+        const addButton = document.createElement('button');
+        addButton.textContent = 'Add to Cart';
+        addButton.onclick = () => addToCart(game.gameName);
+        gamesDesc.appendChild(addButton);
+
         gamesDiv.appendChild(gamesDesc);
         gamesContainer.appendChild(gamesDiv);
     });
-    console.log(gamesContainer);
     return gamesContainer;
 };
 
@@ -225,4 +232,50 @@ document.addEventListener('DOMContentLoaded', () => {
     homeContainer.appendChild(gamesContainer);
 
     document.body.appendChild(homeContainer);
+
+    //initialize the cart array
+let cart = [];
+
+function addToCart(productId) {
+    const product = gameList.find(p => p.gameName === productId);
+    const cartItem = cart.find(item => item.gameName === productId);
+
+    if (cartItem) {
+        cartItem.quantity += 1;
+    } else {
+        cart.push({
+            ...product,
+            quantity: 1
+        });
+    }
+    updateCartDisplay();
+}
+
+function removeFromCart(productId) {
+    const cartItemIndex = cart.findIndex(item => item.gameName === productId);
+
+    if (cartItemIndex > -1) {
+        cart[cartItemIndex].quantity -= 1;
+        if (cart[cartItemIndex].quantity === 0) {
+            cart.splice(cartItemIndex, 1);
+        }
+        updateCartDisplay();
+    }
+}
+
+function updateCartDisplay() {
+    const cartContainer = document.getElementById('cartItems');
+    cartContainer.innerHTML = ''; 
+
+    cart.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.textContent = `${item.gameName} - $${item.price} x ${item.quantity}`;
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.onclick = () => removeFromCart(item.gameName);
+        itemElement.appendChild(removeButton);
+        cartContainer.appendChild(itemElement);
+    });
+}
+
 });
