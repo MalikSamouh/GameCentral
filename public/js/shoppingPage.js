@@ -277,5 +277,4 @@ function updateCartDisplay() {
         cartContainer.appendChild(itemElement);
     });
 }
-
 });
