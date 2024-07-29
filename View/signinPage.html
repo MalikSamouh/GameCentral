@@ -23,7 +23,7 @@
   </header>
   <div class="container">
     <h1>Sign in to your account</h1>
-    <form id="signin-form">
+    <form id="signin-form" action="/api/signin" method="POST">
       <label for="email">Email address</label>
       <input type="email" id="email" name="email" required>
       <label for="password">Password</label>
@@ -31,22 +31,5 @@
       <button type="submit">Sign in</button>
     </form>
   </div>
-<!-- Need to fix the server side -->
-  <script>
-    document.getElementById('signin-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    const response = await fetch('http://localhost:3000/signin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-
-    const result = await response.text();
-    alert(result);
-  });
-</script>
 </body>
 </html>
