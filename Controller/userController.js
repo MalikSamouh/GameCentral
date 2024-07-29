@@ -2,8 +2,9 @@ const bcrypt = require('bcryptjs');
 const User = require('../Model/userModel');
 
 exports.registerUser = async (req, res) => {
+    console.log(req);
   try {
-    const { username, email, password, address } = req.body;
+    const { username, email, password } = req.body;
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -11,15 +12,18 @@ exports.registerUser = async (req, res) => {
       return res.status(400).send('User already exists');
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Define salt rounds
+    const saltRounds = 10;
 
+    // Hash the password
+    // const hashedPassword = await bcrypt.hash(password, saltRounds);
+// json, parseJson + stringify
     // Create new user
     const newUser = new User({
-      username,
+
+        username,
       email,
-      password: hashedPassword,
-      address,
+      password,
     });
 
     await newUser.save();
