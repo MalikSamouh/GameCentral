@@ -8,8 +8,6 @@ const app = express();
 
 // Middleware to parse request bodies
 app.use(bodyParser.json());
-
-// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database connection
@@ -24,6 +22,10 @@ mongoose.connection.on('connected', () => {
 
 mongoose.connection.on('error', (err) => {
   console.error(`Failed to connect to MongoDB: ${err.message}`);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('Disconnected from MongoDB');
 });
 
 // Routes

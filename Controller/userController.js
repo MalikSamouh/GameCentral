@@ -23,18 +23,10 @@ exports.registerUser = async (req, res) => {
     });
 
     await newUser.save();
-    res.redirect('/register');
+    res.redirect('/registerPage');
   } catch (error) {
     res.status(500).send(error.message);
   }
-};
-
-exports.showRegisterPage = (req, res) => {
-  res.render('register');
-};
-
-exports.showLoginPage = (req, res) => {
-  res.render('login');
 };
 
 exports.loginUser = async (req, res) => {
