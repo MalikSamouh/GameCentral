@@ -6,8 +6,10 @@ const userRoutes = require('./backend/userRoutes');
 
 const app = express();
 
-// Middleware
+// Middleware to parse request bodies
 app.use(bodyParser.json());
+
+// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Database connection
@@ -21,7 +23,7 @@ mongoose.connection.on('connected', () => {
 });
 
 mongoose.connection.on('error', (err) => {
-  console.log(`Failed to connect to MongoDB: ${err}`);
+  console.error(`Failed to connect to MongoDB: ${err.message}`);
 });
 
 // Routes
@@ -29,15 +31,15 @@ app.use('/api', userRoutes);
 
 // Serve HTML pages
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'homePage.html'));
+  res.sendFile(path.join(__dirname, 'View', 'homePage.html'));
 });
 
 app.get('/registerPage', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'registerPage.html'));
+  res.sendFile(path.join(__dirname, 'View', 'registerPage.html'));
 });
 
 app.get('/signinPage', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'signinPage.html'));
+  res.sendFile(path.join(__dirname, 'View', 'signinPage.html'));
 });
 
 const PORT = process.env.PORT || 3000;
