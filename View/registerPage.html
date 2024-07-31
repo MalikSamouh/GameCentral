@@ -23,7 +23,7 @@
     </header>
     <div class="container">
         <h1>Register your account</h1>
-        <form id="registration-form" action="/api/register" method="POST">
+        <form id="registration-form" action="javascript:" onsubmit="fetch('/register')" method="POST">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>
 
