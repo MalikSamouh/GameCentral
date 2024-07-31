@@ -21,9 +21,9 @@ exports.registerUser = async (req, res) => {
     // Create new user
     const newUser = new User({
 
-        username,
-      email,
-      password,
+      username: "malik",
+      email: "malik@gmail.com",
+      password: "123",
     });
 
     await newUser.save();
