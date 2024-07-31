@@ -1,0 +1,23 @@
+{
+  "name": "gamecentral",
+  "version": "1.0.0",
+  "description": "Welcome to GameCentral, your one-stop digital storefront for all your favorite video games. GameCentral provides a seamless and interactive platform for gamers to explore, purchase, and manage their digital game library. This project involves designing, implementing, testing, and deploying a web application that supports both Customers and Administrators to interact with the e-store efficiently.",
+  "main": "tempCodeRunnerFile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MalikSamouh/GameCentral.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MalikSamouh/GameCentral/issues"
+  },
+  "homepage": "https://github.com/MalikSamouh/GameCentral#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
