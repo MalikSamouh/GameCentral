@@ -1,5 +1,5 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const userRoutes = require('./userRoutes');
@@ -9,8 +9,8 @@ const app = express();
 const port = 3001;
 
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json()); // bodyParser
+app.use(express.urlencoded({ extended: true })); //bodyParser
 
 
 mongoose.connect('mongodb+srv://testing:8gW6ByBqL36rrzoJ@ecommerce.zzyeljs.mongodb.net/', {
@@ -31,8 +31,9 @@ mongoose.connect('mongodb+srv://testing:8gW6ByBqL36rrzoJ@ecommerce.zzyeljs.mongo
 
   
     // Middleware to parse request bodies
-    app.use(bodyParser.json());
-    app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the public directory
+    app.use(express.static(path.join(__dirname, 'public')));
+    // app.use(bodyParser.json());
+    // app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the public directory
   
   // Routes
   app.use('/api', userRoutes);
@@ -44,6 +45,10 @@ mongoose.connect('mongodb+srv://testing:8gW6ByBqL36rrzoJ@ecommerce.zzyeljs.mongo
   
   app.get('/registerPage', (req, res) => {
     res.sendFile(path.join(__dirname, 'View', 'registerPage.html'));
+  });
+
+  app.get('/shoppingPage', (req, res) => {
+    res.sendFile(path.join(__dirname, 'View', 'shoppingPage.html'));
   });
   
   app.get('/signinPage', (req, res) => {

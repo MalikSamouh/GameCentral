@@ -4,8 +4,11 @@ const userController = require('./Controller/userController');
 const productController = require('./Controller/productController');
 
 
+// User routes
 router.post('/register', userController.registerUser);
 router.post('/signin', userController.loginUser);
+
+// Product routes
 router.get('/', productController.getProducts);
 
 
