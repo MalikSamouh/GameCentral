@@ -1,67 +1,16 @@
-// test variable for gameList
-const gameList = [
-    {
-        gameName: 'testName1',
-        publisher: 'Test Publisher 1',
-        category: 'Game',
-        genre: 'Test Genre 1',
-        price: '19.99',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'Test Publisher 1',
-        genre: 'Test Genre 1',
-        category: 'DLC',
-        price: '19.99',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'Test Publisher 2',
-        category: 'Game',
-        genre: 'Test Genre 3',
-        price: '19.99',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'Test Publisher 1',
-        category: 'DLC',
-        genre: 'Test Genre 3',
-        price: '19.99',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'Test Publisher 3',
-        category: 'DLC',
-        genre: 'Test Genre 3',
-        price: '19.99',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'Test Publisher 2',
-        category: 'Game',
-        genre: 'Test Genre 2',
-        price: '19.99',
-        pic: '../public/images/FlagofCanada.png',
-    },
-    {
-        gameName: 'testName1',
-        publisher: 'Test Publisher 3',
-        category: 'Soundtrack',
-        genre: 'Test Genre 1',
-        price: '19.99',
-        pic: '../public/images/FlagofCanada.png',
-    },
-];
+const getGameList = async () => {
+    try {
+        const response = await fetch('api/product');
+        const items = await response.json();
+        return items;
+    } catch (error) {
+        console.error('Error fetching items:', error);
+    }
+}
 
-// test variable for filter list
 const filterList = [
     {
-        filterName: 'Category',
+        filterName: 'Type',
         filterOptions: [
             {
                 optionName: 'Game'
@@ -89,16 +38,19 @@ const filterList = [
         ]
     },
     {
-        filterName: 'Genre',
+        filterName: 'Category',
         filterOptions: [
             {
-                optionName: 'Test Genre 1'
+                optionName: 'Action'
             },
             {
-                optionName: 'Test Genre 2'
+                optionName: 'Sports'
             },
             {
-                optionName: 'Test Genre 3'
+                optionName: 'RPG'
+            },
+            {
+                optionName: 'Strategy'
             },
         ]
     }
@@ -142,7 +94,8 @@ const loadGamesContainer = (displayedGames) => {
 };
 
 // function for data rendering
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const gameList = await getGameList();
     const homeContainer = document.createElement('div');
     homeContainer.className = 'homeContainer';
     const title = document.createElement('div');

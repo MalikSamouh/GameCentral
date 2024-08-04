@@ -9,7 +9,7 @@ router.post('/register', userController.registerUser);
 router.post('/signin', userController.loginUser);
 
 // Product routes
-router.get('/', productController.getProducts);
+router.get('/product', productController.getProducts);
 
 
 module.exports = router;
