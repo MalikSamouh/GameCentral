@@ -16,17 +16,19 @@ exports.registerUser = async (req, res) => {
     const saltRounds = 10;
 
     // Hash the password
-    // const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log('Hashed password:', hashedPassword); // Debugging line to confirm password hashing
+
 // json, parseJson + stringify
     // Create new user
     const newUser = new User({
       username,
       email,
-      password,
+      password: hashedPassword,
     });
 
     await newUser.save();
-    res.redirect('/');
+    res.redirect('/signinPage');
   } catch (error) {
     res.status(500).send(error.message);
   }
@@ -52,6 +54,7 @@ exports.loginUser = async (req, res) => {
     console.log('User found:', user); // Debugging line to confirm user retrieval
 
     // Compare passwords
+    // console.log(password.bcrypt)
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.log('Password does not match');
