@@ -6,21 +6,16 @@ exports.registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).send('User already exists');
     }
 
-    // Define salt rounds
     const saltRounds = 10;
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    console.log('Hashed password:', hashedPassword); // Debugging line to confirm password hashing
+    console.log('Hashed password:', hashedPassword);
 
-// json, parseJson + stringify
-    // Create new user
     const newUser = new User({
       username,
       email,
@@ -36,7 +31,7 @@ exports.registerUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
-    console.log('Request body:', req.body); // Log the request body
+    console.log('Request body:', req.body);
 
     const { email, password } = req.body;
 
@@ -51,21 +46,17 @@ exports.loginUser = async (req, res) => {
       return res.status(400).send('Invalid email or password');
     }
 
-    console.log('User found:', user); // Debugging line to confirm user retrieval
+    console.log('User found:', user);
 
-    // Compare passwords
-    // console.log(password.bcrypt)
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.log('Password does not match');
       return res.status(400).send('Invalid email or password');
     }
 
-    // Set user session
     req.session.userId = user._id;
     req.session.username = user.username;
 
-    // Successful login, redirect to home page
     res.redirect('/');
   } catch (error) {
     console.error('Error during login:', error);
@@ -88,7 +79,5 @@ exports.getUserProfile = (req, res) => {
   if (!req.session.userId) {
     return res.status(401).send('Not authenticated');
   }
-  // Here you can fetch user data from the database using req.session.userId
-  // and send it back to the client
   res.json({ username: req.session.username });
 };
