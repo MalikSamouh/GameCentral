@@ -61,10 +61,34 @@ exports.loginUser = async (req, res) => {
       return res.status(400).send('Invalid email or password');
     }
 
+    // Set user session
+    req.session.userId = user._id;
+    req.session.username = user.username;
+
     // Successful login, redirect to home page
     res.redirect('/');
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).send(error.message);
   }
+};
+
+
+exports.logoutUser = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.status(500).send('Error logging out');
+    }
+    res.redirect('/');
+  });
+};
+
+exports.getUserProfile = (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).send('Not authenticated');
+  }
+  // Here you can fetch user data from the database using req.session.userId
+  // and send it back to the client
+  res.json({ username: req.session.username });
 };
