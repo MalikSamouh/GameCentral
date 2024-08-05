@@ -13,6 +13,14 @@ app.use(express.json()); // bodyParser
 app.use(express.urlencoded({ extended: true })); //bodyParser
 
 
+// Set up session middleware
+app.use(session({
+  secret: 'your_secret_key', // Replace with a strong, unique secret
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Set to true if using https
+}));
+
 mongoose.connect('mongodb+srv://testing:8gW6ByBqL36rrzoJ@ecommerce.zzyeljs.mongodb.net/', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
