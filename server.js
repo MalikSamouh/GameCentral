@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 // const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
@@ -12,13 +13,11 @@ app.use(cors());
 app.use(express.json()); // bodyParser
 app.use(express.urlencoded({ extended: true })); //bodyParser
 
-
-// Set up session middleware
 app.use(session({
-  secret: 'your_secret_key', // Replace with a strong, unique secret
+  secret: 'your_secret_key',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Set to true if using https
+  cookie: { secure: false }
 }));
 
 mongoose.connect('mongodb+srv://testing:8gW6ByBqL36rrzoJ@ecommerce.zzyeljs.mongodb.net/', {
@@ -37,16 +36,12 @@ mongoose.connect('mongodb+srv://testing:8gW6ByBqL36rrzoJ@ecommerce.zzyeljs.mongo
     console.log('Disconnected from MongoDB');
   });
 
-  
-    // Middleware to parse request bodies
     app.use(express.static(path.join(__dirname, 'public')));
     // app.use(bodyParser.json());
     // app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the public directory
   
-  // Routes
   app.use('/api', userRoutes);
   
-  // Serve HTML pages
   app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'View', 'homePage.html'));
   });
