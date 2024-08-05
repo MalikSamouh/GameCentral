@@ -62,7 +62,7 @@ const loadGamesContainer = (displayedGames) => {
     displayedGames.forEach(game => {
         const gamesDiv = document.createElement('div');
         const gamesImage = document.createElement('img');
-        gamesImage.src = game.pic;
+        gamesImage.src = game.image_url;
         gamesImage.className = 'gamePic';
         gamesDiv.appendChild(gamesImage);
 
@@ -70,11 +70,11 @@ const loadGamesContainer = (displayedGames) => {
         gamesDesc.className = 'gameDesc';
         const gameName = document.createElement('div');
         gameName.className = 'gameName';
-        gameName.textContent = game.gameName;
+        gameName.textContent = game.product_name;
         gamesDesc.appendChild(gameName);
 
         const gamePublisher = document.createElement('div');
-        gamePublisher.textContent = game.publisher;
+        gamePublisher.textContent = game.description;
         gamesDesc.appendChild(gamePublisher);
 
         const gamePrice = document.createElement('div');

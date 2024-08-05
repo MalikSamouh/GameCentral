@@ -2,10 +2,9 @@ const Product = require('../Model/productModel');
 
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find(filter).limit(20);
-    res.render('home', { products });
-    return products;
+    const products = await Product.find({});
+    res.status(200).json(products);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json({error});
   }
 };
