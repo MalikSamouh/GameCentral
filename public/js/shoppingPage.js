@@ -56,6 +56,53 @@ const filterList = [
     }
 ];
 
+
+//initialize the cart array
+let cart = [];
+
+function removeFromCart(productId) {
+    const cartItemIndex = cart.findIndex(item => item.product_name === productId);
+
+    if (cartItemIndex > -1) {
+        cart[cartItemIndex].quantity -= 1;
+        if (cart[cartItemIndex].quantity === 0) {
+            cart.splice(cartItemIndex, 1);
+        }
+        updateCartDisplay();
+    }
+}
+
+function updateCartDisplay() {
+    const cartContainer = document.getElementById('cartItems');
+    cartContainer.innerHTML = '';
+
+    cart.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.textContent = `${item.product_name} - $${item.price} x ${item.quantity}`;
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.onclick = () => removeFromCart(item.product_name);
+        itemElement.appendChild(removeButton);
+        cartContainer.appendChild(itemElement);
+    });
+}
+
+function addToCart(productId, gameList) {
+    console.log(cart);
+    const product = gameList.find(p => p.product_name === productId);
+    const cartItem = cart.find(item => item.product_name === productId);
+
+    if (cartItem) {
+        cartItem.quantity += 1;
+    } else {
+        cart.push({
+            ...product,
+            quantity: 1
+        });
+    }
+    updateCartDisplay();
+}
+
 const loadGamesContainer = (displayedGames) => {
     const gamesContainer = document.createElement('div');
     gamesContainer.className = 'games';
@@ -84,7 +131,7 @@ const loadGamesContainer = (displayedGames) => {
 
         const addButton = document.createElement('button');
         addButton.textContent = 'Add to Cart';
-        addButton.onclick = () => addToCart(game.gameName);
+        addButton.onclick = () => addToCart(game.product_name, displayedGames);
         gamesDesc.appendChild(addButton);
 
         gamesDiv.appendChild(gamesDesc);
@@ -168,7 +215,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         displayedGames = gameList.filter((game) => {
             if (selectedFilters.length !== 0) {
                 return selectedFilters.some((filter) => filter == game.publisher
-                || filter == game.genre || filter == game.category)
+                    || filter == game.genre || filter == game.category)
             }
             return gameList;
         });
@@ -185,49 +232,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     homeContainer.appendChild(gamesContainer);
 
     document.body.appendChild(homeContainer);
-
-    //initialize the cart array
-let cart = [];
-
-function addToCart(productId) {
-    const product = gameList.find(p => p.gameName === productId);
-    const cartItem = cart.find(item => item.gameName === productId);
-
-    if (cartItem) {
-        cartItem.quantity += 1;
-    } else {
-        cart.push({
-            ...product,
-            quantity: 1
-        });
-    }
-    updateCartDisplay();
-}
-
-function removeFromCart(productId) {
-    const cartItemIndex = cart.findIndex(item => item.gameName === productId);
-
-    if (cartItemIndex > -1) {
-        cart[cartItemIndex].quantity -= 1;
-        if (cart[cartItemIndex].quantity === 0) {
-            cart.splice(cartItemIndex, 1);
-        }
-        updateCartDisplay();
-    }
-}
-
-function updateCartDisplay() {
-    const cartContainer = document.getElementById('cartItems');
-    cartContainer.innerHTML = ''; 
-
-    cart.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.textContent = `${item.gameName} - $${item.price} x ${item.quantity}`;
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'Remove';
-        removeButton.onclick = () => removeFromCart(item.gameName);
-        itemElement.appendChild(removeButton);
-        cartContainer.appendChild(itemElement);
-    });
-}
 });
