@@ -1,4 +1,4 @@
-document.getElementById('registration-form').addEventListener('submit', function(event) {
+document.getElementById('registration-form').addEventListener('submit', (event) => {
     event.preventDefault(); 
 
     const formData = new FormData(this);

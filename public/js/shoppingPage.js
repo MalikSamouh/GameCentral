@@ -75,20 +75,24 @@ function removeFromCart(productId) {
 function updateCartDisplay() {
     const cartContainer = document.getElementById('cartItems');
     cartContainer.innerHTML = '';
+    let totalPrice = 0;
 
     cart.forEach(item => {
         const itemElement = document.createElement('div');
-        itemElement.textContent = `${item.product_name} - $${item.price} x ${item.quantity}`;
+        itemElement.textContent = `${item.product_name} - $${item.price} x ${item.quantity} = ${item.price*item.quantity} `;
         const removeButton = document.createElement('button');
         removeButton.textContent = 'Remove';
         removeButton.onclick = () => removeFromCart(item.product_name);
         itemElement.appendChild(removeButton);
         cartContainer.appendChild(itemElement);
+        totalPrice += item.price*item.quantity;
     });
+    const total = document.createElement('div');
+    total.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
+    cartContainer.appendChild(total);
 }
 
 function addToCart(productId, gameList) {
-    console.log(cart);
     const product = gameList.find(p => p.product_name === productId);
     const cartItem = cart.find(item => item.product_name === productId);
 
