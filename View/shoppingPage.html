@@ -2,40 +2,47 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="js/shoppingPage.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Page</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="js/shoppingPage.js"></script>
 </head>
 
 <body>
-    <header>
-        <a href="/">
-          <div class="logo">
-            <img src="/images/gameStore.png" alt="Logo">
-          </div>
-        </a>
-        <div class="top-right">
-          <a href="/signinPage">Sign in</a>
-          <span>|</span>
-          <a href="/registerPage">Register </a>
-          <img src="/images/FlagofCanada.png" alt="Canadian Flag">
-          <span> CAD</span>
-        </div>
-      </header>
-        
-        <div id="productsContainer" class="products-container">
-        </div>
-        
-        <div id="cartContainer" class="cart-container">
-            <h2>Your Cart</h2>
-            <div id="cartItems"></div> 
-        </div>
-    
-        <script src="js/shoppingPage.js"></script>
-    </body>
-    
+  <header>
+    <a href="/">
+      <div class="logo">
+        <img src="/images/gameStore.png" alt="Logo">
+      </div>
+    </a>
+    <div class="top-right">
+      <button class="cartButton" id="cartButton"><img src="/images/shoppingCartEmpty.png" alt="Canadian Flag" class="shoppingCart" id="shoppingCartIcon"></button>
+      <a href="/signinPage">Sign in</a>
+      <span>|</span>
+      <a href="/registerPage">Register </a>
+      <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+      <span> CAD</span>
+    </div>
+  </header>
+
+
+
+  <div id="cartModal" class="cartModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="cartContainer" class="cart-container">
+        <h2>Your Cart</h2>
+        <div id="cartItems"></div>
+        <div id="price">Total Price: $0.00</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/shoppingPage.js"></script>
+</body>
+
 
 
 </html>

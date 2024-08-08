@@ -79,17 +79,27 @@ function updateCartDisplay() {
 
     cart.forEach(item => {
         const itemElement = document.createElement('div');
-        itemElement.textContent = `${item.product_name} - $${item.price} x ${item.quantity} = ${item.price*item.quantity} `;
+        itemElement.textContent = `${item.product_name} - $${item.price} x ${item.quantity} = ${item.price * item.quantity} `;
         const removeButton = document.createElement('button');
         removeButton.textContent = 'Remove';
         removeButton.onclick = () => removeFromCart(item.product_name);
         itemElement.appendChild(removeButton);
         cartContainer.appendChild(itemElement);
-        totalPrice += item.price*item.quantity;
+        totalPrice += item.price * item.quantity;
     });
-    const total = document.createElement('div');
-    total.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
-    cartContainer.appendChild(total);
+    const total = document.getElementById('price');
+    if (total) {
+        total.innerHTML = '';
+    }
+    const totalPriceDiv = document.createElement('div');
+    totalPriceDiv.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
+    cartContainer.appendChild(totalPriceDiv);
+    const cartImage = document.getElementById('shoppingCartIcon');
+    if (cart.length > 0) {
+        cartImage.src = '/images/shoppingCartFull.png';
+    } else {
+        cartImage.src = '/images/shoppingCartEmpty.png';
+    }
 }
 
 function addToCart(productId, gameList) {
@@ -144,8 +154,23 @@ const loadGamesContainer = (displayedGames) => {
     return gamesContainer;
 };
 
-// function for data rendering
 document.addEventListener('DOMContentLoaded', async () => {
+
+    const cartModal = document.getElementById("cartModal");
+    const cartButton = document.getElementById("cartButton");
+    const cartSpan = document.getElementsByClassName("close")[0];
+    cartButton.onclick = () => {
+        cartModal.style.display = "block";
+    }
+    cartSpan.onclick = () => {
+        cartModal.style.display = "none";
+    }
+    window.onclick = (event) => {
+        if (event.target == cartModal) {
+            cartModal.style.display = "none";
+        }
+    }
+
     const gameList = await getGameList();
     const homeContainer = document.createElement('div');
     homeContainer.className = 'homeContainer';

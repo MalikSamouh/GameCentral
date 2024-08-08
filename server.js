@@ -1,6 +1,5 @@
 const express = require('express');
 const session = require('express-session');
-// const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const userRoutes = require('./userRoutes');
@@ -10,8 +9,8 @@ const app = express();
 const port = 3001;
 
 app.use(cors());
-app.use(express.json()); // bodyParser
-app.use(express.urlencoded({ extended: true })); //bodyParser
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
   secret: 'your_secret_key',
@@ -21,48 +20,41 @@ app.use(session({
 }));
 
 mongoose.connect('mongodb+srv://testing:8gW6ByBqL36rrzoJ@ecommerce.zzyeljs.mongodb.net/', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  mongoose.connection.on('connected', () => {
-    console.log('Connected to MongoDB');
-  });
-  
-  mongoose.connection.on('error', (err) => {
-    console.error(`Failed to connect to MongoDB: ${err.message}`);
-  });
-  
-  mongoose.connection.on('disconnected', () => {
-    console.log('Disconnected from MongoDB');
-  });
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+mongoose.connection.on('connected', () => {
+  console.log('Connected to MongoDB');
+});
 
-    app.use(express.static(path.join(__dirname, 'public')));
-    // app.use(bodyParser.json());
-    // app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the public directory
-  
-  app.use('/api', userRoutes);
-  
-  app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'View', 'homePage.html'));
-  });
-  
-  app.get('/registerPage', (req, res) => {
-    res.sendFile(path.join(__dirname, 'View', 'registerPage.html'));
-  });
+mongoose.connection.on('error', (err) => {
+  console.error(`Failed to connect to MongoDB: ${err.message}`);
+});
 
-  app.get('/shoppingPage', (req, res) => {
-    res.sendFile(path.join(__dirname, 'View', 'shoppingPage.html'));
-  });
-  
-  app.get('/signinPage', (req, res) => {
-    res.sendFile(path.join(__dirname, 'View', 'signinPage.html'));
-  });
-  
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-  
+mongoose.connection.on('disconnected', () => {
+  console.log('Disconnected from MongoDB');
+});
 
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api', userRoutes);
 
-  
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'View', 'homePage.html'));
+});
+
+app.get('/registerPage', (req, res) => {
+  res.sendFile(path.join(__dirname, 'View', 'registerPage.html'));
+});
+
+app.get('/shoppingPage', (req, res) => {
+  res.sendFile(path.join(__dirname, 'View', 'shoppingPage.html'));
+});
+
+app.get('/signinPage', (req, res) => {
+  res.sendFile(path.join(__dirname, 'View', 'signinPage.html'));
+});
+
+const PORT = process.env.PORT || port;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
