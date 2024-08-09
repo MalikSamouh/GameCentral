@@ -5,12 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
+<<<<<<< Updated upstream
     <link rel="stylesheet" href="../public/css/styles.css">
     <script src="../public/js/shoppingPage.js"></script>
+=======
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="js/shoppingPage.js"></script>
+>>>>>>> Stashed changes
 </head>
 
 <body>
     <header>
+<<<<<<< Updated upstream
         <a href="homePage.html">
             <div class="logo">
                 <img src="../public/images/gameStore.png" alt="Logo">
@@ -27,3 +33,58 @@
 </body>
 
 </html>
+=======
+        <a href="/">
+            <div class="logo">
+                <img src="/images/gameStore.png" alt="Logo">
+            </div>
+        </a>
+        <div class="top-right">
+            <button class="cartButton" id="cartButton"><img src="/images/shoppingCartEmpty.png" alt="Shopping Cart" class="shoppingCart" id="shoppingCartIcon"></button>
+            
+            <!-- User links (sign in/register) -->
+            <span id="user-links">
+                <a href="/signinPage">Sign in</a>
+                <span>|</span>
+                <a href="/registerPage">Register</a>
+            </span>
+            
+            <!-- User profile (welcome/profile/logout) -->
+            <span id="user-profile" style="display: none;">
+                <a href="/profile">Your Profile</a>
+                <span>|</span>
+                <a href="/logout">Logout</a>
+            </span>
+            
+            <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+            <span> CAD</span>
+        </div>
+    </header>
+
+    <div id="cartModal" class="cartModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="cartContainer" class="cart-container">
+                <h2>Your Cart</h2>
+                <div id="cartItems"></div>
+                <div id="price">Total Price: $0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if the user is logged in
+        const username = localStorage.getItem('username');
+        if (username) {
+            document.getElementById('user-links').style.display = 'none';
+            document.getElementById('user-profile').style.display = 'inline';
+            // Optionally, you can display the username somewhere in the header
+            document.getElementById('user-profile').innerHTML = `Welcome, ${username} | <a href="/profile">Your Profile</a> | <a href="/logout">Logout</a>`;
+        }
+    </script>
+
+    <script src="js/shoppingPage.js"></script>
+</body>
+
+</html>
+>>>>>>> Stashed changes

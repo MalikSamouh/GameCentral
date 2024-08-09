@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Home Page</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <a href="/">
+            <div class="logo">
+                <img src="/images/gameStore.png" alt="Logo">
+            </div>
+        </a>
+        <div class="top-right">
+            <a href="/profile">Your Profile</a>
+            <span>|</span>
+            <a href="/logout">Logout</a>
+            <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+            <span>CAD</span>
+        </div>
+    </header>
+    <div class="container">
+        <h1>Welcome back, <span id="username">Guest</span>!</h1>
+        <p>Explore the games!</p>
+        <a href="shoppingPage">
+            <div class="shoppingButton">
+                <div>Shop Now</div>
+            </div>
+        </a>
+    </div>
+
+    <script>
+        document.getElementById('username').textContent = localStorage.getItem('username') || 'Guest';
+    </script>
+</body>
+</html>
