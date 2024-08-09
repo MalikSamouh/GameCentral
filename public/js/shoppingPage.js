@@ -1,3 +1,4 @@
+// const User = require("../Model/userModel");
 const getGameList = async () => {
     try {
         const response = await fetch('api/product');
@@ -102,7 +103,25 @@ function updateCartDisplay() {
     }
 }
 
-function addToCart(productId, gameList) {
+
+async function isUserLoggedIn() {
+    try {
+        const response = await fetch('/api/checkLogin');
+        const data = await response.json();
+        return data.isLoggedIn;
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        return false;
+    }
+}
+
+async function addToCart(productId, gameList) {
+    const loggedIn = await isUserLoggedIn();
+    if (!loggedIn) {
+        window.location.href = '/signinPage'; // Redirect to the sign-in page
+        return;
+    }
+
     const product = gameList.find(p => p.product_name === productId);
     const cartItem = cart.find(item => item.product_name === productId);
 
@@ -155,7 +174,8 @@ const loadGamesContainer = (displayedGames) => {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-
+    updateUserStatus();
+    
     const cartModal = document.getElementById("cartModal");
     const cartButton = document.getElementById("cartButton");
     const cartSpan = document.getElementsByClassName("close")[0];
@@ -262,3 +282,72 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.body.appendChild(homeContainer);
 });
+
+async function updateUserStatus() {
+    try {
+        const response = await fetch('/api/checkLogin');
+        const data = await response.json();
+        
+        const userStatusDiv = document.querySelector('.top-right');
+
+        if (data.isLoggedIn) {
+            userStatusDiv.innerHTML = `
+                <span>Hello, ${data.username}</span> 
+                <div class="user-container">
+                    <img src="/images/userIcon.png" alt="User Icon" class="user-icon" id="userIcon">
+                    <div id="userMenu" class="user-menu">
+                        <a href="#" id="logoutButton">Logout</a>
+                    </div>
+                </div>
+                <button class="cartButton" id="cartButton">
+                  <img src="/images/shoppingCartEmpty.png" alt="Shopping Cart" class="shoppingCart" id="shoppingCartIcon">
+                </button>
+            `;
+
+            // Add event listener for the user icon click to toggle the menu
+            const userIcon = document.getElementById('userIcon');
+            const userMenu = document.getElementById('userMenu');
+            if (userIcon) {
+                userIcon.addEventListener('click', () => {
+                    userMenu.classList.toggle('show');
+                });
+            }
+
+            // Add event listener for the logout button
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    const response = await fetch('/api/logout', { method: 'POST' });
+                    if (response.ok) {
+                        updateUserStatus(); // Refresh the user status after logout
+                        setTimeout(() => {
+                            window.location.href = '/'; // Optional: Redirect to home page
+                        }, 500);
+                    } else {
+                        console.error('Logout failed');
+                    }
+                });
+            }
+
+        } else {
+            userStatusDiv.innerHTML = `
+                <button class="cartButton" id="cartButton">
+                  <img src="/images/shoppingCartEmpty.png" alt="Shopping Cart" class="shoppingCart" id="shoppingCartIcon">
+                </button>
+                <a href="/signinPage">Sign in</a>
+                <span>|</span>
+                <a href="/registerPage">Register</a>
+                <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+                <span>CAD</span>
+            `;
+        }
+    } catch (error) {
+        console.error('Error fetching login status:', error);
+    }
+}
+
+// Ensure this function is called when the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', updateUserStatus);
+
+

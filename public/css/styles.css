@@ -27,6 +27,7 @@ body {
     display: flex;
     align-items: center;
   }
+
   
   .top-right a {
     margin: 0 10px;
@@ -229,4 +230,42 @@ body {
     margin: 0;
     padding: 0;
   }
+}
+
+
+
+.user-container {
+  position: relative;
+  display: inline-block;
+}
+
+.user-icon {
+  cursor: pointer;
+}
+
+.user-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  min-width: 160px;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.user-menu a {
+  color: black;
+  padding: 8px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.user-menu a:hover {
+  background-color: #f1f1f1;
+}
+
+.show {
+  display: block;
 }

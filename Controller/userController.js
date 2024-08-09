@@ -57,7 +57,7 @@ exports.loginUser = async (req, res) => {
     req.session.userId = user._id;
     req.session.username = user.username;
 
-    res.redirect('/');
+    res.redirect('/shoppingPage');
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).send(error.message);
@@ -74,6 +74,15 @@ exports.logoutUser = (req, res) => {
     res.redirect('/');
   });
 };
+
+exports.checkLogin = (req, res) => {
+  if (req.session.userId) {
+    res.json({ isLoggedIn: true, username: req.session.username });
+} else {
+    res.json({ isLoggedIn: false });
+}
+};
+
 
 exports.getUserProfile = (req, res) => {
   if (!req.session.userId) {

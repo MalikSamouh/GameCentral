@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home Page</title>
+  <title>Shopping Page</title>
   <link rel="stylesheet" href="/css/styles.css">
-  <script src="js/shoppingPage.js"></script>
+  <script src="js/shoppingPage.js"></script> 
 </head>
 
 <body>
@@ -17,16 +17,16 @@
       </div>
     </a>
     <div class="top-right">
-      <button class="cartButton" id="cartButton"><img src="/images/shoppingCartEmpty.png" alt="Canadian Flag" class="shoppingCart" id="shoppingCartIcon"></button>
+      <button class="cartButton" id="cartButton">
+        <img src="/images/shoppingCartEmpty.png" alt="Shopping Cart" class="shoppingCart" id="shoppingCartIcon">
+      </button>
       <a href="/signinPage">Sign in</a>
       <span>|</span>
-      <a href="/registerPage">Register </a>
+      <a href="/registerPage">Register</a>
       <img src="/images/FlagofCanada.png" alt="Canadian Flag">
-      <span> CAD</span>
+      <span>CAD</span>
     </div>
   </header>
-
-
 
   <div id="cartModal" class="cartModal">
     <div class="modal-content">
@@ -37,12 +37,12 @@
         <div id="price">Total Price: $0.00</div>
       </div>
     </div>
-
   </div>
 
-  <script src="js/shoppingPage.js"></script>
+  <script>
+    // Ensure that updateUserStatus is called when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', updateUserStatus);
+  </script>
 </body>
-
-
 
 </html>
