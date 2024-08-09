@@ -39,8 +39,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', userRoutes);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'View', 'homePage.html'));
+  if (req.session.userId) {
+    res.sendFile(path.join(__dirname, 'View', 'userHomePage.html'));
+  } else {
+    res.sendFile(path.join(__dirname, 'View', 'homePage.html'));
+  }
 });
+
 
 app.get('/registerPage', (req, res) => {
   res.sendFile(path.join(__dirname, 'View', 'registerPage.html'));

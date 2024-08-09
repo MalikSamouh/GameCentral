@@ -54,8 +54,7 @@ const filterList = [
             },
         ]
     }
-];
-
+]
 
 //initialize the cart array
 let cart = [];
