@@ -71,67 +71,85 @@ async function isUserLoggedIn() {
 //initialize the cart array
 let cart = [];
 
-function removeFromCart(productId) {
-    const cartItemIndex = cart.findIndex(item => item.product_name === productId);
+async function loadCart() {
+  try {
+    const response = await fetch('/api/cart');
+    const data = await response.json();
+    cart = data.cart;
+    updateCartDisplay();
+  } catch (error) {
+    console.error('Error loading cart:', error);
+  }
+}
 
-    if (cartItemIndex > -1) {
-        cart[cartItemIndex].quantity -= 1;
-        if (cart[cartItemIndex].quantity === 0) {
-            cart.splice(cartItemIndex, 1);
-        }
-        updateCartDisplay();
+async function addToCart(productName) {
+  try {
+    const response = await fetch('/api/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productName, quantity: 1 }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      cart = data.cart;
+      updateCartDisplay();
+    } else {
+      const error = await response.json();
+      console.error('Error adding to cart:', error);
     }
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+  }
+}
+
+async function removeFromCart(productName) {
+  try {
+    const response = await fetch('/api/cart/remove', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productName }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      cart = data.cart;
+      updateCartDisplay();
+    } else {
+      const error = await response.json();
+      console.error('Error removing from cart:', error);
+    }
+  } catch (error) {
+    console.error('Error removing from cart:', error);
+  }
 }
 
 function updateCartDisplay() {
-    const cartContainer = document.getElementById('cartItems');
-    cartContainer.innerHTML = '';
-    let totalPrice = 0;
+  const cartContainer = document.getElementById('cartItems');
+  cartContainer.innerHTML = '';
+  let totalPrice = 0;
 
-    cart.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.textContent = `${item.product_name} - $${item.price} x ${item.quantity} = ${item.price * item.quantity} `;
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'Remove';
-        removeButton.onclick = () => removeFromCart(item.product_name);
-        itemElement.appendChild(removeButton);
-        cartContainer.appendChild(itemElement);
-        totalPrice += item.price * item.quantity;
-    });
-    const total = document.getElementById('price');
-    if (total) {
-        total.innerHTML = '';
-    }
-    const totalPriceDiv = document.createElement('div');
-    totalPriceDiv.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
-    cartContainer.appendChild(totalPriceDiv);
-    const cartImage = document.getElementById('shoppingCartIcon');
-    if (cart.length > 0) {
-        cartImage.src = '/images/shoppingCartFull.png';
-    } else {
-        cartImage.src = '/images/shoppingCartEmpty.png';
-    }
-}
+  cart.forEach(item => {
+    const itemElement = document.createElement('div');
+    itemElement.textContent = `${item.product.product_name} - $${item.product.price} x ${item.quantity} = $${item.product.price * item.quantity} `;
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remove';
+    removeButton.onclick = () => removeFromCart(item.product.product_name);
+    itemElement.appendChild(removeButton);
+    cartContainer.appendChild(itemElement);
+    totalPrice += item.product.price * item.quantity;
+  });
 
-const addToCart = async (productId, gameList) => {
-    const loggedIn = await isUserLoggedIn();
-    if (!loggedIn) {
-        window.location.href = '/signinPage';
-        return;
-    }
+  const totalPriceDiv = document.createElement('div');
+  totalPriceDiv.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
+  cartContainer.appendChild(totalPriceDiv);
 
-    const product = gameList.find(p => p.product_name === productId);
-    const cartItem = cart.find(item => item.product_name === productId);
-
-    if (cartItem) {
-        cartItem.quantity += 1;
-    } else {
-        cart.push({
-            ...product,
-            quantity: 1
-        });
-    }
-    updateCartDisplay();
+  const cartImage = document.getElementById('shoppingCartIcon');
+  cartImage.src = cart.length > 0 ? '/images/shoppingCartFull.png' : '/images/shoppingCartEmpty.png';
 }
 
 const loadGamesContainer = (displayedGames) => {
@@ -354,6 +372,7 @@ async function updateUserStatus() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', loadCart);
 document.addEventListener('DOMContentLoaded', updateUserStatus);
 
 
