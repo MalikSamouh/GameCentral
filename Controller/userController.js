@@ -1,5 +1,9 @@
 const bcrypt = require('bcryptjs');
 const User = require('../Model/userModel');
+const cartController = require('./cartController');
+
+// const Cart = require('../Model/cartModel');
+// const Product = require('../Model/productModel');
 
 exports.registerUser = async (req, res) => {
     // console.log(req); 
@@ -58,6 +62,10 @@ exports.loginUser = async (req, res) => {
     req.session.username = user.username;
     req.session.email = user.email;
 
+    // const cart = await Cart.findOne({ user: user._id }).populate('items.product');
+    // req.session.cart = cart ? cart.items : [];
+    req.session.cart = await cartController.loadCart(user._id);
+
     res.redirect('/shoppingPage');
   } catch (error) {
     console.error('Error during login:', error);
@@ -66,14 +74,24 @@ exports.loginUser = async (req, res) => {
 };
 
 
-exports.logoutUser = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Error destroying session:', err);
-      return res.status(500).send('Error logging out');
+exports.logoutUser = async (req, res) => {
+  try {
+    // Save the cart to the database before destroying the session
+    if (req.session.userId && req.session.cart) {
+      await cartController.saveCart(req.session.userId, req.session.cart);
     }
-    res.redirect('/');
-  });
+
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        return res.status(500).send('Error logging out');
+      }
+      res.redirect('/');
+    });
+  } catch (error) {
+    console.error('Error during logout:', error);
+    res.status(500).send(error.message);
+  }
 };
 
 exports.checkLogin = (req, res) => {
