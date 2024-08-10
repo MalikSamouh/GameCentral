@@ -58,6 +58,9 @@ app.get('/shoppingPage', (req, res) => {
 app.get('/signinPage', (req, res) => {
   res.sendFile(path.join(__dirname, 'View', 'signinPage.html'));
 });
+app.get('/profile', (req, res) => {
+  res.sendFile(path.join(__dirname, 'View', 'userHomePage.html'));
+});
 
 const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
