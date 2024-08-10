@@ -117,7 +117,7 @@ async function isUserLoggedIn() {
 const addToCart = async (productId, gameList) => {
     const loggedIn = await isUserLoggedIn();
     if (!loggedIn) {
-        window.location.href = '/signinPage'; // Redirect to the sign-in page
+        window.location.href = '/signinPage';
         return;
     }
 
@@ -174,13 +174,20 @@ const loadGamesContainer = (displayedGames) => {
 
 document.addEventListener('DOMContentLoaded', async () => {
     updateUserStatus();
-    
+
     const cartModal = document.getElementById("cartModal");
     const cartButton = document.getElementById("cartButton");
     const cartSpan = document.getElementsByClassName("close")[0];
+    const userLoggerIn = await isUserLoggedIn();
+    
     cartButton.onclick = () => {
-        console.log('clicked');
-        cartModal.style.display = "block";
+        if (userLoggerIn) {
+            console.log('clicked');
+            cartModal.style.display = "block";
+        } else {
+            window.location.href = '/signinPage';
+            return;
+        }
     }
     cartSpan.onclick = () => {
         cartModal.style.display = "none";
@@ -190,6 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             cartModal.style.display = "none";
         }
     }
+
 
     const gameList = await getGameList();
     const homeContainer = document.createElement('div');
@@ -287,7 +295,7 @@ async function updateUserStatus() {
     try {
         const response = await fetch('/api/checkLogin');
         const data = await response.json();
-        
+
         const userStatusDiv = document.getElementById('login-block');
 
         if (data.isLoggedIn) {

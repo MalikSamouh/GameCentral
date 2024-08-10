@@ -6,18 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <script src="js/shoppingPage.js" defer></script>
 </head>
 
 <body>
     <header>
         <a href="/">
             <div class="logo">
-                <img src="/images/gameStore.png" alt="Logo">
+              <img src="/images/gameStore.png" alt="Logo">
             </div>
-        </a>
-        <div class="top-right">
-            
-        </div>
+          </a>
+          <div class="top-right" id="top-right">
+            <div class="login-block" id="login-block">
+              <a href="/signinPage">Sign in</a>
+              <span>|</span>
+              <a href="/registerPage">Register</a>
+              <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+              <span>CAD</span>
+            </div>
+          </div>
     </header>
     <div class="container">
         <h1>Welcome to GameCentral!</h1>
@@ -29,7 +36,6 @@
     </div>
     <script src="js/shoppingPage.js"></script>
   <script>
-    // Call the updateUserStatus function once the DOM is fully loaded
     document.addEventListener('DOMContentLoaded', updateUserStatus);
   </script>
 </body>
