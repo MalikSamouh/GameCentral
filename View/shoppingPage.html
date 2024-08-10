@@ -4,52 +4,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home Page</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="js/shoppingPage.js"></script>
+  <title>Shopping Page</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="js/shoppingPage.js"></script>
 </head>
 
 <body>
-    <header>
-        <a href="/">
-            <div class="logo">
-                <img src="/images/gameStore.png" alt="Logo">
-            </div>
-        </a>
-        <div class="top-right">
-            <button class="cartButton" id="cartButton"><img src="/images/shoppingCartEmpty.png" alt="Shopping Cart" class="shoppingCart" id="shoppingCartIcon"></button>
-            
-            <!-- User links (sign in/register) -->
-            <span id="user-links">
-                <a href="/signinPage">Sign in</a>
-                <span>|</span>
-                <a href="/registerPage">Register</a>
-            </span>
-            
-            <!-- User profile (welcome/profile/logout) -->
-            <span id="user-profile" style="display: none;">
-                <a href="/profile">Your Profile</a>
-                <span>|</span>
-                <a href="/logout">Logout</a>
-            </span>
-            
-            <img src="/images/FlagofCanada.png" alt="Canadian Flag">
-            <span> CAD</span>
-        </div>
-    </header>
-
-    <div id="cartModal" class="cartModal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div id="cartContainer" class="cart-container">
-                <h2>Your Cart</h2>
-                <div id="cartItems"></div>
-                <div id="price">Total Price: $0.00</div>
-            </div>
-        </div>
+  <header>
+    <a href="/">
+      <div class="logo">
+        <img src="/images/gameStore.png" alt="Logo">
+      </div>
+    </a>
+    <div class="top-right" id="top-right">
+      <div class="login-block" id="login-block">
+        <a href="/signinPage">Sign in</a>
+        <span>|</span>
+        <a href="/registerPage">Register</a>
+        <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+        <span>CAD</span>
+      </div>
+      <button class="cartButton" id="cartButton">
+        <img src="/images/shoppingCartEmpty.png" alt="Shopping Cart" class="shoppingCart" id="shoppingCartIcon">
+      </button>
     </div>
+  </header>
 
-    <script src="js/shoppingPage.js"></script>
+  <div id="cartModal" class="cartModal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="cartContainer" class="cart-container">
+        <h2>Your Cart</h2>
+        <div id="cartItems"></div>
+        <div id="price">Total Price: $0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/shoppingPage.js"></script>
 </body>
 
 </html>
