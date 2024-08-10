@@ -6,36 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Home Page</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <script src="js/userHomePage.js"></script>
 </head>
 
 <body>
     <header>
         <a href="/">
             <div class="logo">
-                <img src="/images/gameStore.png" alt="Logo">
+              <img src="/images/gameStore.png" alt="Logo">
             </div>
-        </a>
-        <div class="top-right">
-            <a href="/profile">Your Profile</a>
-            <span>|</span>
-            <a href="/">Logout</a>
-            <img src="/images/FlagofCanada.png" alt="Canadian Flag">
-            <span>CAD</span>
-        </div>
+          </a>
+          <div class="top-right" id="top-right">
+            <div class="login-block" id="login-block">
+              <a href="/signinPage">Sign in</a>
+              <span>|</span>
+              <a href="/registerPage">Register</a>
+              <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+              <span>CAD</span>
+            </div>
+          </div>
     </header>
-    <div class="container">
-        <h1>Welcome back, <span id="username">Guest</span>!</h1>
-        <p>Explore the games!</p>
-        <a href="shoppingPage">
-            <div class="shoppingButton">
-                <div>Shop Now</div>
+    <body>
+        <div class="user-page">
+            <h1>Your Information</h1>
+            <div class="user-info">
+                <div class="username"><strong>Username:</strong> </div>
+                <div id="username"></div>
             </div>
-        </a>
-    </div>
-
-    <script>
-        document.getElementById('username').innerHTML = localStorage.getItem('username') || 'Guest';
-    </script>
+            <div class="email-info">
+                <div class="email"><strong>Email:</strong>  </div>
+                <div id="email"></div>
+            </div>
+        </div>
+    </body>
 </body>
 
 </html>

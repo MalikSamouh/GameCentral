@@ -57,6 +57,17 @@ const filterList = [
     }
 ]
 
+async function isUserLoggedIn() {
+    try {
+        const response = await fetch('/api/checkLogin');
+        const data = await response.json();
+        return data.isLoggedIn;
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        return false;
+    }
+}
+
 //initialize the cart array
 let cart = [];
 
@@ -99,18 +110,6 @@ function updateCartDisplay() {
         cartImage.src = '/images/shoppingCartFull.png';
     } else {
         cartImage.src = '/images/shoppingCartEmpty.png';
-    }
-}
-
-
-async function isUserLoggedIn() {
-    try {
-        const response = await fetch('/api/checkLogin');
-        const data = await response.json();
-        return data.isLoggedIn;
-    } catch (error) {
-        console.error('Error checking login status:', error);
-        return false;
     }
 }
 
@@ -304,12 +303,12 @@ async function updateUserStatus() {
                 <div class="user-container">
                     <img src="/images/userIcon.png" alt="User Icon" class="user-icon" id="userIcon">
                     <div id="userMenu" class="user-menu">
+                        <a href="#" id="userProfileButton">User Profile</a>
                         <a href="#" id="logoutButton">Logout</a>
                     </div>
                 </div>
             `;
 
-            // Add event listener for the user icon click to toggle the menu
             const userIcon = document.getElementById('userIcon');
             const userMenu = document.getElementById('userMenu');
             if (userIcon) {
@@ -318,16 +317,22 @@ async function updateUserStatus() {
                 });
             }
 
-            // Add event listener for the logout button
+            const userProfileButton = document.getElementById('userProfileButton');
+            if (userProfileButton) {
+                userProfileButton.addEventListener('click', () => {
+                    window.location.href = '/profile';
+                });
+            };
+
             const logoutButton = document.getElementById('logoutButton');
             if (logoutButton) {
                 logoutButton.addEventListener('click', async (event) => {
                     event.preventDefault();
                     const response = await fetch('/api/logout', { method: 'POST' });
                     if (response.ok) {
-                        updateUserStatus(); // Refresh the user status after logout
+                        updateUserStatus();
                         setTimeout(() => {
-                            window.location.href = '/'; // Optional: Redirect to home page
+                            window.location.href = '/';
                         }, 500);
                     } else {
                         console.error('Logout failed');
@@ -349,7 +354,6 @@ async function updateUserStatus() {
     }
 }
 
-// Ensure this function is called when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', updateUserStatus);
 
 

@@ -269,3 +269,7 @@ body {
 .show {
   display: block;
 }
+
+.user-info, .email-info {
+  display: flex;
+}

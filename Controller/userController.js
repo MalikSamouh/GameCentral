@@ -56,6 +56,7 @@ exports.loginUser = async (req, res) => {
 
     req.session.userId = user._id;
     req.session.username = user.username;
+    req.session.email = user.email;
 
     res.redirect('/shoppingPage');
   } catch (error) {
@@ -77,7 +78,8 @@ exports.logoutUser = (req, res) => {
 
 exports.checkLogin = (req, res) => {
   if (req.session.userId) {
-    res.json({ isLoggedIn: true, username: req.session.username });
+    console.log(req.session);
+    res.json({ isLoggedIn: true, username: req.session.username, email: req.session.email });
 } else {
     res.json({ isLoggedIn: false });
 }
