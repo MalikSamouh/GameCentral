@@ -57,7 +57,7 @@ exports.loginUser = async (req, res) => {
     req.session.userId = user._id;
     req.session.username = user.username;
 
-    res.redirect('/shoppingPage');
+    res.redirect('/profile');
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).send(error.message);
