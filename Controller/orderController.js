@@ -6,7 +6,29 @@ const { ObjectId } = require('mongodb');
 
 
 exports.putOrder = async (req, res) => {
-// TODO: add method
+    try {
+        const { userEmail, name, billingAddress, city, state, postalCode, country, cart, totalPrice } = req.body;
+        const user = await User.findOne({ email: userEmail });
+        const userFullAdress = {
+            address: billingAddress,
+            city,
+            state,
+            postalCode,
+            country,
+        };
+        console.log(userFullAdress);
+        const order = new Order({
+          user,
+          items: cart,
+          total_price: totalPrice,
+          status: false,
+          user_address: userFullAdress,
+        });
+        console.log(order);
+        await order.save();
+      } catch (error) {
+        res.status(500).send(error.message);
+      }
 };
 
 exports.getAllOrders = async (req, res) => {

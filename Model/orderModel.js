@@ -5,12 +5,10 @@ const orderSchema = new mongoose.Schema({
         username: {
             type: String,
             required: true,
-            unique: true,
         },
         email: {
             type: String,
             required: true,
-            unique: true,
         },
         isAdmin: {
             type: Boolean,
@@ -45,6 +43,28 @@ const orderSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
     },
+    user_address: new mongoose.Schema({
+        address: {
+            type: String,
+            required: true,
+        },
+        city: {
+            type: String,
+            required: true,
+        },
+        state: {
+            type: String,
+            required: true,
+        },
+        postalCode: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+        },
+    }),
 });
 
 const Order = mongoose.model('Order', orderSchema);

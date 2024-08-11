@@ -22,7 +22,7 @@ router.post('/cart/remove', cartController.removeFromCart);
 router.get('/cart', cartController.getCart);
 
 // orders
-router.put('/orders', orderController.putOrder);
+router.post('/orders', orderController.putOrder);
 router.get('/orders', orderController.getAllOrders);
 router.get('/orders/:id', orderController.getOrdersByUserId);
 

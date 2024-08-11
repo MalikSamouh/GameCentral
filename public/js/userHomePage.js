@@ -99,17 +99,22 @@ async function displayOrderDetails(loggedUser) {
     const ordersContainer = document.createElement('div');
     const orders = await ordersFetch.json();
     if (orders.length === 0) {
-        ordersContainer.innerHTML = `<strong> You do not have orders. <a href="/shoppingPage">Make one.</a></strong>`; 
+        ordersContainer.innerHTML = `<strong> You do not have orders. <a href="/shoppingPage">Make one.</a></strong>`;
     }
     orders.forEach(order => {
         const orderContainer = document.createElement('div');
-        let innerHTML = `<hr>
+        let innerHTML = `
             <strong>Receiver:</strong> ${order.user.username} (${order.user.email})<br>
-            <strong>Address:</strong> ${order.user.address}<br>
+            <strong>Address:</strong> ${order.user_address.address}<br>
+            <strong>City:</strong> ${order.user_address.city}<br>
+            <strong>State:</strong> ${order.user_address.state}<br>
+            <strong>Postal Code:</strong> ${order.user_address.postalCode}<br>
+            <strong>Country:</strong> ${order.user_address.country}<br>
             <strong>Status:</strong> ${order.status ? 'Delivered' : 'In progress'}<br>
             <strong>Items:</strong> <ul>`;
         order.items.forEach(item => {
-            innerHTML += `<li>${item.product_name} x ${item.quantity} = ${(item.quantity * item.price).toFixed(2)}</li>`;
+            console.log(item.product);
+            innerHTML += `<li>${item.product[0].product_name} x ${item.quantity} = ${(item.quantity * item.product[0].price).toFixed(2)}</li>`;
         });
         innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price}<br><hr>`
         orderContainer.innerHTML = innerHTML;
