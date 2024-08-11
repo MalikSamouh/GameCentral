@@ -14,9 +14,13 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
     background-color: #ffffff; /* different shade */
     border-bottom: 1px solid #ddd;
+    position: fixed; 
+    top: 0;
+    width: 99%; 
+    /* z-index: 100; */
   }
   
   .logo img {
