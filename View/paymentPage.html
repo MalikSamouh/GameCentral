@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Payment</h1>
+    </header>
+    <div class="container">
+        <h2>Enter Payment Details</h2>
+        <form id="paymentForm" action="/api/processPayment" method="POST">
+            <label for="cardNumber">Card Number</label>
+            <input type="text" id="cardNumber" name="cardNumber" required>
+            <label for="expiryDate">Expiry Date</label>
+            <input type="text" id="expiryDate" name="expiryDate" required>
+            <label for="cvv">CVV</label>
+            <input type="text" id="cvv" name="cvv" required>
+            <button type="submit">Pay Now</button>
+        </form>
+    </div>
+</body>
+</html>
