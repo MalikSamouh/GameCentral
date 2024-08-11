@@ -26,6 +26,7 @@ exports.putOrder = async (req, res) => {
         });
         console.log(order);
         await order.save();
+        res.status(200).send(order);
       } catch (error) {
         res.status(500).send(error.message);
       }
