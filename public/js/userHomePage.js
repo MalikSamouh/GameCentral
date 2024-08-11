@@ -140,7 +140,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('editUsername').value = userLoggedIn.username; //user edit
         document.getElementById('editEmail').value = userLoggedIn.email; //email edit
 
-        await displayOrderDetails(userLoggedIn);
     }
     const editUsernameButton = document.getElementById('editUsernameButton'); //editing the user and email
     const editEmailButton = document.getElementById('editEmailButton');
@@ -174,8 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (response.ok) {
                 alert('Profile updated successfully!');
-                updateUserStatus();
-                editFormContainer.style.display = 'none';
+                window.location.href = '/profile';
             } else {
                 alert('Failed to update profile.');
             }
@@ -183,4 +181,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error updating profile:', error);
         }
     });
+
+    await displayOrderDetails(userLoggedIn);
 });
