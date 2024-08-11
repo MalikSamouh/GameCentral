@@ -69,7 +69,6 @@ async function isUserLoggedIn() {
 }
 
 //initialize the cart array
-let cart = [];
 
 async function loadCart() {
   try {
@@ -199,7 +198,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     cartButton.onclick = () => {
         if (userLoggerIn) {
-            console.log('clicked');
             cartModal.style.display = "block";
         } else {
             window.location.href = '/signinPage';

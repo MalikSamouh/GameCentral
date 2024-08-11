@@ -73,17 +73,64 @@ async function isUserLoggedIn() {
     }
 }
 
+// order methods
+async function getOrders(user) {
+    let orders = [];
+    if (user.email === 'admin@gmail.com') {
+        orders = await fetch('/api/orders');
+    } else {
+        orders = await fetch(`/api/orders/${user.email}`);
+    }
+    return orders;
+};
+
+async function addOrder(orders) {
+    const options = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orders })
+    };
+    await fetch('/orders', options);
+}
+
+async function displayOrderDetails(loggedUser) {
+    const detailsDiv = document.getElementById('orders-container');
+    const ordersFetch = await getOrders(loggedUser);
+    const ordersContainer = document.createElement('div');
+    const orders = await ordersFetch.json();
+    if (orders.length === 0) {
+        ordersContainer.innerHTML = `<strong> You do not have orders. <a href="/shoppingPage">Make one.</a></strong>`; 
+    }
+    orders.forEach(order => {
+        const orderContainer = document.createElement('div');
+        let innerHTML = `<hr>
+            <strong>Receiver:</strong> ${order.user.username} (${order.user.email})<br>
+            <strong>Address:</strong> ${order.user.address}<br>
+            <strong>Status:</strong> ${order.status ? 'Delivered' : 'In progress'}<br>
+            <strong>Items:</strong> <ul>`;
+        order.items.forEach(item => {
+            innerHTML += `<li>${item.product_name} x ${item.quantity} = ${(item.quantity * item.price).toFixed(2)}</li>`;
+        });
+        innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price}<br><hr>`
+        orderContainer.innerHTML = innerHTML;
+        ordersContainer.appendChild(orderContainer);
+    });
+    detailsDiv.append(ordersContainer);
+}
+
+// load content on page
+
 document.addEventListener('DOMContentLoaded', async () => {
     updateUserStatus();
-    const userLoggerIn = await isUserLoggedIn();
-    console.log(userLoggerIn);
-    if (!userLoggerIn.isLoggedIn) {
+    const userLoggedIn = await isUserLoggedIn();
+    if (!userLoggedIn.isLoggedIn) {
         window.location.href = '/signinPage';
         return;
     } else {
         const usernameContainer = document.getElementById('username');
-        usernameContainer.innerHTML = `${userLoggerIn.username}`
+        usernameContainer.innerHTML = `${userLoggedIn.username}`
         const emailContainer = document.getElementById('email');
-        emailContainer.innerHTML = `${userLoggerIn.email}`
+        emailContainer.innerHTML = `${userLoggedIn.email}`
+        await displayOrderDetails(userLoggedIn);
     }
 });

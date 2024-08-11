@@ -1,22 +1,42 @@
 const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true
-    },
-    items: mongoose.Schema({
-        product: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product',
-            required: true
+    user: new mongoose.Schema({
+        username: {
+            type: String,
+            required: true,
+            unique: true,
         },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        isAdmin: {
+            type: Boolean,
+            default: false,
+        },
+        address: {
+            type: String,
+        },
+    }),
+    items: [new mongoose.Schema({
+        product: [new mongoose.Schema({
+            product_name: {
+                type: String,
+                required: true,
+            },
+            price: {
+                type: Number,
+                required: true,
+            },
+        })],
         quantity: {
             type: Number,
             required: true,
             min: 1
         }
-    }),
+    })],
     total_price: {
         type: Number,
         required: true,

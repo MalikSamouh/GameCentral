@@ -24,6 +24,6 @@ router.get('/cart', cartController.getCart);
 // orders
 router.put('/orders', orderController.putOrder);
 router.get('/orders', orderController.getAllOrders);
-router.get('/orders/id', orderController.getOrdersByUserId);
+router.get('/orders/:id', orderController.getOrdersByUserId);
 
 module.exports = router;

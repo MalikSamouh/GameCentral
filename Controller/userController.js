@@ -6,7 +6,6 @@ const cartController = require('./cartController');
 // const Product = require('../Model/productModel');
 
 exports.registerUser = async (req, res) => {
-    // console.log(req); 
   try {
     const { username, email, password } = req.body;
 
@@ -18,7 +17,7 @@ exports.registerUser = async (req, res) => {
     const saltRounds = 10;
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    console.log('Hashed password:', hashedPassword);
+    // console.log('Hashed password:', hashedPassword);
 
     const newUser = new User({
       username,
@@ -35,7 +34,7 @@ exports.registerUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
-    console.log('Request body:', req.body);
+    // ('Request body:', req.body);
 
     const { email, password } = req.body;
 
@@ -50,7 +49,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).send('Invalid email or password');
     }
 
-    console.log('User found:', user);
+    // console.log('User found:', user);
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -96,7 +95,7 @@ exports.logoutUser = async (req, res) => {
 
 exports.checkLogin = (req, res) => {
   if (req.session.userId) {
-    console.log(req.session);
+    // (req.session);
     res.json({ isLoggedIn: true, username: req.session.username, email: req.session.email });
 } else {
     res.json({ isLoggedIn: false });
