@@ -3,6 +3,7 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const path = require('path');
 const userRoutes = require('./userRoutes');
+const User = require('./Model/userModel');
 
 const cors = require('cors');
 const app = express();
@@ -67,3 +68,28 @@ const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+app.post('/api/updateProfile', async (req, res) => { //for updating the username and the email address from databse
+  const { username, email } = req.body;
+
+  try {
+      const userId = req.session.userId;  
+      if (!userId) {
+          return res.status(401).json({ message: 'Not authenticated' });
+      }
+
+      await User.findByIdAndUpdate(userId, { username, email });
+
+      req.session.username = username;
+      req.session.email = email;
+
+      res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (error) {
+      console.error('Error updating profile:', error);
+      res.status(500).json({ message: 'Failed to update profile' });
+  }
+});
+
+
+
+

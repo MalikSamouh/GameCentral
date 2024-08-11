@@ -136,6 +136,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         usernameContainer.innerHTML = `${userLoggedIn.username}`
         const emailContainer = document.getElementById('email');
         emailContainer.innerHTML = `${userLoggedIn.email}`
+
+        document.getElementById('editUsername').value = userLoggedIn.username; //user edit
+        document.getElementById('editEmail').value = userLoggedIn.email; //email edit
+
         await displayOrderDetails(userLoggedIn);
     }
+    const editUsernameButton = document.getElementById('editUsernameButton'); //editing the user and email
+    const editEmailButton = document.getElementById('editEmailButton');
+    const editFormContainer = document.getElementById('editFormContainer');
+
+    editUsernameButton.addEventListener('click', () => {
+        editFormContainer.style.display = 'block';
+        document.getElementById('editUsername').focus();
+    });
+
+    editEmailButton.addEventListener('click', () => {
+        editFormContainer.style.display = 'block';
+        document.getElementById('editEmail').focus();
+    });
+
+    const profileForm = document.getElementById('editProfileForm');
+    profileForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const updatedUsername = document.getElementById('editUsername').value;
+        const updatedEmail = document.getElementById('editEmail').value;
+
+        try {
+            const response = await fetch('/api/updateProfile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: updatedUsername, email: updatedEmail })
+            });
+
+            if (response.ok) {
+                alert('Profile updated successfully!');
+                updateUserStatus();
+                editFormContainer.style.display = 'none';
+            } else {
+                alert('Failed to update profile.');
+            }
+        } catch (error) {
+            console.error('Error updating profile:', error);
+        }
+    });
 });
