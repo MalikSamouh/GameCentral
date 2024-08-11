@@ -90,7 +90,11 @@ async function addToCart(productName) {
       },
       body: JSON.stringify({ productName, quantity: 1 }),
     });
-
+    const userLoggedIn = await isUserLoggedIn();
+    if (!userLoggedIn) {
+        window.location.href = '/signinPage';
+        return;
+    }
     if (response.ok) {
       const data = await response.json();
       cart = data.cart;
@@ -188,12 +192,46 @@ const loadGamesContainer = (displayedGames) => {
     return gamesContainer;
 };
 
+function updateCheckoutPage() {
+    const cartSummary = document.getElementById('cartSummary');
+    if (cartSummary) {
+        cartSummary.innerHTML = ''; // Clear previous contents
+        let total = 0;
+
+        // Check if the cart has any items
+        if (cart.length === 0) {
+            cartSummary.textContent = "Your cart is empty.";
+        } else {
+            // Loop through each cart item and add it to the summary
+            cart.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.textContent = `${item.product.product_name} - $${item.product.price} x ${item.quantity} = $${(item.product.price * item.quantity).toFixed(2)}`;
+                cartSummary.appendChild(itemElement);
+                total += item.product.price * item.quantity;
+            });
+
+            const totalElement = document.createElement('div');
+            totalElement.textContent = `Total: $${total.toFixed(2)}`;
+            cartSummary.appendChild(totalElement);
+        }
+    }
+}
+
+
 document.addEventListener('DOMContentLoaded', async () => {
     updateUserStatus();
+    updateUserStatus();
+    await loadCart(); 
+
+    if (window.location.pathname === '/checkoutPage.html') {
+        updateCheckoutPage(); 
+    }
+
 
     const cartModal = document.getElementById("cartModal");
     const cartButton = document.getElementById("cartButton");
     const cartSpan = document.getElementsByClassName("close")[0];
+    
     const userLoggerIn = await isUserLoggedIn();
     
     cartButton.onclick = () => {
@@ -211,6 +249,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (event.target == cartModal) {
             cartModal.style.display = "none";
         }
+    }
+    const checkoutButton = document.getElementById("checkoutButton");
+    if (checkoutButton) {
+        checkoutButton.onclick = () => {
+            window.location.href = "/checkoutPage.html"; 
+        };
     }
 
 
@@ -305,6 +349,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.body.appendChild(homeContainer);
 });
+
+
 
 async function updateUserStatus() {
     try {

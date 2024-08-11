@@ -58,6 +58,11 @@ app.get('/profile', (req, res) => {
   res.sendFile(path.join(__dirname, 'View', 'userHomePage.html'));
 });
 
+app.get('/checkoutPage.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'View', 'checkoutPage.html'));
+});
+
+
 const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
