@@ -103,7 +103,9 @@ async function displayOrderDetails(loggedUser) {
     }
     orders.forEach(order => {
         const orderContainer = document.createElement('div');
+        const orderDate = new Date(order.createdAt); // Convert the timestamp to a readable date
         let innerHTML = `
+            <strong>Order Date:</strong> ${orderDate.toLocaleString()}<br>
             <strong>Receiver:</strong> ${order.user.username} (${order.user.email})<br>
             <strong>Address:</strong> ${order.user_address.address}<br>
             <strong>City:</strong> ${order.user_address.city}<br>
