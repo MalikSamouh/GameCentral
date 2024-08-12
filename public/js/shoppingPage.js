@@ -31,10 +31,15 @@ function getFilter(productsList) {
             filterOptions: allPublishers,
         },
         {
-            filterName: 'Sort By',
+            filterName: 'Name Sorting',
             filterOptions: [
                 { optionName: 'Name (A-Z)', type: 'radio', name: 'sortBy' },
                 { optionName: 'Name (Z-A)', type: 'radio', name: 'sortBy' },
+            ]
+        },
+        {
+            filterName: 'Price Sorting',
+            filterOptions: [
                 { optionName: 'Price (ASC)', type: 'radio', name: 'sortBy' },
                 { optionName: 'Price (DESC)', type: 'radio', name: 'sortBy' },
             ]
@@ -289,10 +294,6 @@ async function updateShoppingPage() {
             filterOptions.appendChild(document.createElement("br"));
             filterOption.addEventListener("change", () => {
                 if (filter.filterName === 'Sort By') {
-                    selectedFilters = selectedFilters.filter(f => 
-                        !['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(f)
-                    );
-    
                     if (filterOption.checked) {
                         selectedFilters.push(option.optionName);
                     }
@@ -347,13 +348,13 @@ async function updateShoppingPage() {
         }
 
     
-        const sortFilter = selectedFilters.find(filter =>
+        const sortFilter = selectedFilters.filter(filter =>
             ['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
         );
     
-        if (sortFilter) {
-            displayedGames = sortBy(displayedGames, sortFilter);
-        }
+        sortFilter.forEach(filter => {
+            displayedGames = sortBy(displayedGames, filter);
+        });
     
         const newGamesContainer = loadGamesContainer(displayedGames);
         homeContainer.appendChild(newGamesContainer);
