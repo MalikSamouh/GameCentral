@@ -15,6 +15,8 @@ router.post('/logout', userController.logoutUser);
 
 // Product routes
 router.get('/product', productController.getProducts);
+router.put('/product', productController.updateStock);
+router.post('/product', productController.removeProductsFromStock);
 
 // Cart routes
 router.post('/cart/add', cartController.addToCart);

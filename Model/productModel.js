@@ -21,6 +21,10 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  quantity_in_stock: {
+    type: Number,
+    required: true,
+  },
 });
 
 const Product = mongoose.model('Product', productSchema);

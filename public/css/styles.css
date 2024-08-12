@@ -191,7 +191,7 @@ body {
   width: 3rem;
 }
 
-.cartModal {
+.cartModal, .adminStockModal {
   display: none;
   position: fixed;
   z-index: 1;
@@ -205,11 +205,17 @@ body {
 
 .modal-content {
   background-color: #fefefe;
-  margin: 15% auto;
-  margin-right: 0;
+  margin: 0;
+  margin-top: 25%;
+  width: 80%;
+  max-width: 37.5rem;
   padding: 20px;
   border: 1px solid #888;
   width: 30%;
+  position: absolute; /* Position relative to its container (in this case, the modal background) */
+            top: 50%; /* Position from the top of the container */
+            left: 50%; /* Position from the left of the container */
+            transform: translate(-50%, -50%);
 }
 
 .close {
@@ -277,4 +283,8 @@ body {
 
 .user-info, .email-info {
   display: flex;
+}
+
+.adminStockButton {
+  display: none;
 }

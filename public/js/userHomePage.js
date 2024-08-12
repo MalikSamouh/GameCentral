@@ -95,8 +95,8 @@ async function addOrder(orders) {
 
 async function displayOrderDetails(loggedUser) {
     const detailsDiv = document.getElementById('orders-container');
-    const ordersFetch = await getOrders(loggedUser);
     const ordersContainer = document.createElement('div');
+    const ordersFetch = await getOrders(loggedUser);
     const orders = await ordersFetch.json();
     if (orders.length === 0) {
         ordersContainer.innerHTML = `<strong> You do not have orders. <a href="/shoppingPage">Make one.</a></strong>`;
@@ -115,7 +115,6 @@ async function displayOrderDetails(loggedUser) {
             <strong>Status:</strong> ${order.status ? 'Delivered' : 'In progress'}<br>
             <strong>Items:</strong> <ul>`;
         order.items.forEach(item => {
-            console.log(item.product);
             innerHTML += `<li>${item.product[0].product_name} x ${item.quantity} = ${(item.quantity * item.product[0].price).toFixed(2)}</li>`;
         });
         innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price}<br><hr>`
@@ -183,6 +182,68 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error updating profile:', error);
         }
     });
-
+    if (userLoggedIn.email == 'admin@gmail.com') {
+        const productsFetch = await fetch('api/product', { method: 'GET' });
+        const products = await productsFetch.json();
+        const modal = document.getElementById("adminStockModal");
+        const btn = document.getElementById("adminStockButton");
+        const span = document.getElementsByClassName("adminStockClose")[0];
+        btn.style.display = "block";
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        const modalBody = document.getElementById('admin-restock-form');
+        products.forEach(product => {
+            const productLabel = document.createElement('label');
+            productLabel.setAttribute('for', `product${product.product_name}`);
+            productLabel.textContent = `${product.product_name} (current stock: ${product.quantity_in_stock}): `;
+            const productInput = document.createElement('input');
+            productInput.setAttribute('type', 'number');
+            productInput.setAttribute('id', `product${product.product_name}`);
+            productInput.setAttribute('name', `${product.product_name}`);
+            productInput.setAttribute('value', product.quantity_in_stock);
+            modalBody.appendChild(productLabel);
+            modalBody.appendChild(productInput);
+            modalBody.appendChild(document.createElement('br'));
+        });
+        const button = document.createElement('button');
+        button.setAttribute('type', 'submit');
+        button.textContent = 'Restock';
+        button.className = 'restock-button';
+        button.id = 'restockButton'; 
+        modalBody.appendChild(button);
+        document.getElementById('admin-restock-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const formValues = Object.fromEntries(formData.entries());
+            const values = {
+                values: Object.entries(formValues).map(([key, value]) => ({
+                    product_name: key,
+                    quantity: value,
+                }))
+            };
+            const newStock = await fetch('api/product', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(values),
+            });
+            if (newStock.ok) {
+                window.alert('Restock Successful');
+                window.location.href = '/profile';
+            } else {
+                window.alert(`Restock Failed: ${newStock.error}`);
+            }
+        });
+    }
     await displayOrderDetails(userLoggedIn);
 });
