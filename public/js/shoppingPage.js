@@ -351,6 +351,7 @@ async function updateCheckoutPage() {
             body: JSON.stringify(combinedData),
         });
         if (orderPlacement.ok) {
+            window.alert('Order placed, thank you! You will be redirected to your profile now. You will see your order there.')
             window.location.href = '/profile';
         } else {
             console.log(orderPlacement.error);
