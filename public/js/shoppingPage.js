@@ -161,10 +161,13 @@ const loadGamesContainer = (displayedGames) => {
     gamesContainer.className = 'games';
     displayedGames.forEach(game => {
         const gamesDiv = document.createElement('div');
+        const gamesImageContainer = document.createElement('div');
+        gamesImageContainer.className = 'gamePicDiv';
         const gamesImage = document.createElement('img');
         gamesImage.src = game.image_url;
         gamesImage.className = 'gamePic';
-        gamesDiv.appendChild(gamesImage);
+        gamesImageContainer.appendChild(gamesImage);
+        gamesDiv.appendChild(gamesImageContainer);
 
         const gamesDesc = document.createElement('div');
         gamesDesc.className = 'gameDesc';
