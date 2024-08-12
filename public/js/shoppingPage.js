@@ -54,9 +54,15 @@ const filterList = [
                 optionName: 'Strategy'
             },
         ]
+    },
+    {
+        filterName: 'Sort By',
+        filterOptions: [
+            { optionName: 'Name' },
+            { optionName: 'Price' },
+        ]
     }
-]
-
+];
 async function isUserLoggedIn() {
     try {
         const response = await fetch('/api/checkLogin');
@@ -271,6 +277,8 @@ async function updateShoppingPage() {
                         }
                     }
                 });
+                
+                
             });
             // plus button that opens the dropdown list
             const plusSign = document.createElement('button');
@@ -292,22 +300,39 @@ async function updateShoppingPage() {
             filterContainer.appendChild(filterDiv);
             filterContainer.appendChild(filterOptions);
         });
+        
         const confirmButton = document.createElement('button');
         confirmButton.textContent = 'Apply Filters';
         confirmButton.className = 'confirmButton'
         confirmButton.addEventListener("click", () => {
-            displayedGames = gameList.filter((game) => {
-                if (selectedFilters.length !== 0) {
-                    return selectedFilters.some((filter) => filter == game.publisher
-                        || filter == game.genre || filter == game.category)
-                }
-                return gameList;
-            });
-            let container = document.getElementsByClassName('games');
-            container[0].innerHTML = '';
-            const newValue = loadGamesContainer(displayedGames);
-            container[0].innerHTML = newValue.innerHTML;
-        });
+            let filteredGames = gameList;
+
+            // Apply filters if other filters are selected
+            const nonSortFilters = selectedFilters.filter(f => f !== 'Name' && f !== 'Price');
+            if (nonSortFilters.length > 0) {
+                filteredGames = gameList.filter((game) => {
+                    return nonSortFilters.some((filter) => 
+                        filter === game.publisher || 
+                        filter === game.genre || 
+                        filter === game.category
+                    );
+                });
+            }
+            // Apply sorting based filter
+            const sortFilter = selectedFilters.find(filter => filter === 'Name' || filter === 'Price');
+            if (sortFilter) {
+                sortBy(filteredGames, sortFilter);
+            }
+
+    // Display the filtered and sorted games
+    let container = document.getElementsByClassName('games');
+    if (container.length > 0) {
+        container[0].innerHTML = ''; // Clear the existing games
+        const newValue = loadGamesContainer(filteredGames); // Load games
+        container[0].innerHTML = newValue.innerHTML;
+    }
+
+});
         filterContainer.appendChild(confirmButton);
         homeContainer.appendChild(filterContainer);
 
@@ -317,6 +342,17 @@ async function updateShoppingPage() {
 
         document.body.appendChild(homeContainer);
 };
+
+function sortBy(array, criteria) { //sorting
+    if (criteria === 'Name') {
+        array.sort((a, b) => a.product_name.localeCompare(b.product_name));
+    } else if (criteria === 'Price') {
+        array.sort((a, b) => a.price - b.price);
+    }
+}
+
+
+
 
 // CHECKOUT PAGE
 
