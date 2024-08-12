@@ -33,10 +33,10 @@ function getFilter(productsList) {
         {
             filterName: 'Sort By',
             filterOptions: [
-                { optionName: 'Name (A-Z)' },
-                { optionName: 'Name (Z-A)' },
-                { optionName: 'Price (ASC)' },
-                { optionName: 'Price (DESC)' },
+                { optionName: 'Name (A-Z)', type: 'radio', name: 'sortBy' },
+                { optionName: 'Name (Z-A)', type: 'radio', name: 'sortBy' },
+                { optionName: 'Price (ASC)', type: 'radio', name: 'sortBy' },
+                { optionName: 'Price (DESC)', type: 'radio', name: 'sortBy' },
             ]
         });
     return filters;
@@ -68,6 +68,7 @@ async function isUserLoggedIn() {
 
 //initialize the cart array
 
+// test
 async function loadCart() {
     try {
         const response = await fetch('/api/cart');
@@ -257,39 +258,39 @@ async function updateShoppingPage() {
         filter.filterOptions.forEach((option) => {
             const filterOptionText = document.createElement('label');
             const filterOption = document.createElement('input');
-            filterOption.type = "checkbox";
+            filterOption.type = option.type || "checkbox"; 
+            filterOption.name = option.name || ''; 
             filterOption.value = option.optionName;
-            filterOption.className = 'filterOption'
+            filterOption.className = 'filterOption';
+
             filterOptionText.appendChild(filterOption);
             filterOptionText.appendChild(document.createTextNode(option.optionName));
             filterOptions.appendChild(filterOptionText);
             filterOptions.appendChild(document.createElement("br"));
             filterOption.addEventListener("change", () => {
-                if (filterOption.checked) {
-                    selectedFilters.push(option.optionName);
+                if (filter.filterName === 'Sort By') {
+                    selectedFilters = selectedFilters.filter(f => 
+                        !['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(f)
+                    );
+    
+                    if (filterOption.checked) {
+                        selectedFilters.push(option.optionName);
+                    }
                 } else {
-                    const index = selectedFilters.indexOf(option.optionName);
-                    if (index !== -1) {
-                        selectedFilters.splice(index, 1);
+                    if (filterOption.checked) {
+                        selectedFilters.push(option.optionName);
+                    } else {
+                        const index = selectedFilters.indexOf(option.optionName);
+                        if (index !== -1) {
+                            selectedFilters.splice(index, 1);
+                        }
                     }
                 }
             });
         });
-        const plusSign = document.createElement('button');
-        plusSign.textContent = '+';
-        plusSign.className = 'filterPlusButton'
-        plusSign.addEventListener("click", () => {
-            if (plusSign.textContent === '+') {
-                plusSign.textContent = '–';
-                filterOptions.style.display = "block";
-            } else {
-                plusSign.textContent = '+';
-                filterOptions.style.display = "none";
-            }
-        });
-        filterDiv.appendChild(plusSign);
+    
+        filterDiv.appendChild(filterOptions);
         filterContainer.appendChild(filterDiv);
-        filterContainer.appendChild(filterOptions);
     });
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Apply Filters';
@@ -299,37 +300,40 @@ async function updateShoppingPage() {
         if (existingGamesContainer) {
             existingGamesContainer.remove();
         }
+    
         displayedGames = gameList.filter((game) => {
-            const nonSortingFilters = selectedFilters.filter((filter) => filter !== 'Name (A-Z)' &&
-                filter !== 'Name (Z-A)' &&
-                filter !== 'Price (ASC)' &&
-                filter !== 'Price (DESC)')
+            const nonSortingFilters = selectedFilters.filter((filter) => 
+                !['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
+            );
+    
             if (nonSortingFilters.length !== 0) {
-                return nonSortingFilters.some((filter) => filter == game.publisher
-                    || filter == game.genre || filter == game.category);
+                return nonSortingFilters.some((filter) => 
+                    filter === game.publisher || filter === game.category
+                );
             }
             return true;
         });
-
+    
         const sortFilter = selectedFilters.find(filter =>
-            filter === 'Name (A-Z)' ||
-            filter === 'Name (Z-A)' ||
-            filter === 'Price (ASC)' ||
-            filter === 'Price (DESC)');
+            ['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
+        );
+    
         if (sortFilter) {
             displayedGames = sortBy(displayedGames, sortFilter);
         }
-
+    
         const newGamesContainer = loadGamesContainer(displayedGames);
         homeContainer.appendChild(newGamesContainer);
     });
+    
     filterContainer.appendChild(confirmButton);
     homeContainer.appendChild(filterContainer);
-
+    
     const gamesContainer = loadGamesContainer(gameList);
     homeContainer.appendChild(gamesContainer);
-
+    
     document.body.appendChild(homeContainer);
+    
 };
 
 // CHECKOUT PAGE
@@ -412,6 +416,10 @@ async function updateCheckoutPage() {
                 body: JSON.stringify(combinedData),
             });
             if (orderPlacement.ok) {
+                // Clear the cart locally
+                cart = [];
+                // Refresh the cart from the server
+                await loadCart();
                 window.alert('Order placed, thank you! You will be redirected to your profile now. You will see your order there.')
                 window.location.href = '/profile';
             } else {
@@ -420,7 +428,6 @@ async function updateCheckoutPage() {
         }
     });
 };
-
 
 // PAGES LOAD
 document.addEventListener('DOMContentLoaded', async () => {
@@ -497,5 +504,3 @@ async function updateUserStatus() {
         console.error('Error fetching login status:', error);
     }
 }
-
-

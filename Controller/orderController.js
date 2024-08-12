@@ -2,8 +2,8 @@ const bcrypt = require('bcryptjs');
 const Order = require('../Model/orderModel');
 const User = require('../Model/userModel');
 const Product = require('../Model/productModel');
+const Cart = require('../Model/cartModel')
 const { ObjectId } = require('mongodb');
-
 
 exports.putOrder = async (req, res) => {
     try {
@@ -24,8 +24,19 @@ exports.putOrder = async (req, res) => {
           user_address: userFullAdress,
         });
         await order.save();
-        res.status(200).send(order);
+
+        // Clear the cart in the database
+        await Cart.findOneAndUpdate(
+            { user: user._id },
+            { $set: { items: [] } }
+        );
+        
+        // Clear the cart in the session
+        req.session.cart = [];
+
+        res.status(200).json({ message: 'Order placed successfully', order });
       } catch (error) {
+        console.log(error);
         res.status(500).send(error.message);
       }
 };
