@@ -308,9 +308,22 @@ async function updateShoppingPage() {
                 }
             });
         });
-    
-        filterDiv.appendChild(filterOptions);
+
+        const plusSign = document.createElement('button');
+        plusSign.textContent = '+';
+        plusSign.className = 'filterPlusButton'
+        plusSign.addEventListener("click", () => {
+            if (plusSign.textContent === '+') {
+                plusSign.textContent = '–';
+                filterOptions.style.display = "block";
+            } else {
+                plusSign.textContent = '+';
+                filterOptions.style.display = "none";
+            }
+        });
+        filterDiv.appendChild(plusSign);
         filterContainer.appendChild(filterDiv);
+        filterContainer.appendChild(filterOptions);
     });
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Apply Filters';
