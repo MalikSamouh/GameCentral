@@ -333,19 +333,19 @@ async function updateShoppingPage() {
         if (existingGamesContainer) {
             existingGamesContainer.remove();
         }
-    
-        displayedGames = gameList.filter((game) => {
-            const nonSortingFilters = selectedFilters.filter((filter) => 
-                !['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
-            );
-    
-            if (nonSortingFilters.length !== 0) {
-                return nonSortingFilters.some((filter) => 
-                    filter === game.publisher || filter === game.category
-                );
-            }
-            return true;
-        });
+        
+        const nonSortingFilters = selectedFilters.filter((filter) => 
+            !['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
+        );
+
+        if (nonSortingFilters.length !== 0) {
+            nonSortingFilters.forEach((filter) => {
+                displayedGames = gameList.filter((game) => {
+                    return filter === game.publisher || filter === game.category;
+                });
+            });
+        }
+
     
         const sortFilter = selectedFilters.find(filter =>
             ['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
