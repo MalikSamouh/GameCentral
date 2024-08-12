@@ -277,7 +277,7 @@ async function updateShoppingPage() {
         if (existingGamesContainer) {
             existingGamesContainer.remove();
         }
-        
+
         displayedGames = gameList.filter((game) => {
             if (selectedFilters.length !== 0) {
                 return selectedFilters.some((filter) => filter == game.publisher
@@ -347,25 +347,41 @@ async function updateCheckoutPage() {
             cart: cart,
             totalPrice: totalPrice,
         };
-        const updateStock = await fetch('api/product', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formValues),
+        let stockError = 'There was an error with placing your order: \n';
+        let outOfStockError = false;
+        cart.forEach(item => {
+            if (item.product.quantity_in_stock - item.quantity < 0) {
+                outOfStockError = true;
+                stockError += `${item.product.product_name} is not available in this quantity. Current stock quantity: ${item.product.quantity_in_stock}.\n`;
+            }
         });
-        const orderPlacement = await fetch('api/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(combinedData),
-        });
-        if (orderPlacement.ok) {
-            window.alert('Order placed, thank you! You will be redirected to your profile now. You will see your order there.')
-            window.location.href = '/profile';
+
+        if (outOfStockError) {
+            stockError += "Please, adjust your order accordingly."
+            window.alert(stockError);
+            window.location.href = '/shoppingPage';
         } else {
-            console.log(orderPlacement.error);
+            const updateStock = await fetch('api/product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(cart),
+            });
+            console.log(updateStock);
+            const orderPlacement = await fetch('api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(combinedData),
+            });
+            if (orderPlacement.ok) {
+                window.alert('Order placed, thank you! You will be redirected to your profile now. You will see your order there.')
+                window.location.href = '/profile';
+            } else {
+                console.log(orderPlacement.error);
+            }
         }
     });
 };
