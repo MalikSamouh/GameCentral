@@ -239,10 +239,10 @@ async function updateShoppingPage() {
     title.textContent = 'Game Catalogue';
     title.className = 'homepageTitle';
     document.body.appendChild(title);
-    const searchContainer = document.createElement('div');
+    const searchContainer = document.createElement('div'); //create a search bar
     searchContainer.className = 'searchContainer';
 
-    const searchInput = document.createElement('input');
+    const searchInput = document.createElement('input'); 
     searchInput.type = 'text';
     searchInput.placeholder = 'Search games...';
     searchInput.id = 'searchInput';
@@ -254,13 +254,13 @@ async function updateShoppingPage() {
 
     searchContainer.appendChild(searchInput);
     searchContainer.appendChild(searchButton);
-    homeContainer.appendChild(searchContainer);
 
     let displayedGames = gameList;
 
     // LOAD FILTERS
     const filterContainer = document.createElement('div');
     filterContainer.className = 'filters';
+    homeContainer.appendChild(searchContainer); //append search
     const selectedFilters = [];
     const filterList = getFilter(gameList);
     filterList.forEach(filter => {
