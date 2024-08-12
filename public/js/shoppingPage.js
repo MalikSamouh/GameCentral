@@ -260,7 +260,7 @@ async function updateShoppingPage() {
     // LOAD FILTERS
     const filterContainer = document.createElement('div');
     filterContainer.className = 'filters';
-    homeContainer.appendChild(searchContainer); //append search
+    filterContainer.appendChild(searchContainer); //append search
     const selectedFilters = [];
     const filterList = getFilter(gameList);
     filterList.forEach(filter => {
