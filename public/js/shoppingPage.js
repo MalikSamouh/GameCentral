@@ -345,6 +345,8 @@ async function updateShoppingPage() {
                     return filter === game.publisher || filter === game.category;
                 });
             });
+        } else {
+            displayedGames = gameList;
         }
 
     
