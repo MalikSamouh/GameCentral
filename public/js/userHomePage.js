@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         button.setAttribute('type', 'submit');
         button.textContent = 'Restock';
         button.className = 'restock-button';
-        button.id = 'restockButton'; 
+        button.id = 'restockButton';
         modalBody.appendChild(button);
         document.getElementById('admin-restock-form').addEventListener('submit', async function (event) {
             event.preventDefault();
@@ -242,6 +242,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.location.href = '/profile';
             } else {
                 window.alert(`Restock Failed: ${newStock.error}`);
+            }
+        });
+        const userDiv = document.getElementById('adminUserListDiv');
+        userDiv.style.display = "block";
+        const allUsersBody = await fetch('api/users');
+        const allUsers = await allUsersBody.json();
+        allUsers.forEach(user => {
+            if (!user.isAdmin) {
+                const userInfo = document.createElement('div');
+                userInfo.innerHTML = `<ul>
+                <li>Username: ${user.username}</li>
+                <li>Email: ${user.username}</li>
+                </ul>
+                <hr>`;
+                userDiv.append(userInfo);
             }
         });
     }

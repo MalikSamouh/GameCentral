@@ -320,3 +320,7 @@ button:hover,
 .adminStockButton {
   display: none;
 }
+
+.adminUserListDiv {
+  display: none;
+}
