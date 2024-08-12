@@ -21,16 +21,39 @@ function getFilter(productsList) {
             allCategories.push({ optionName: product.category });
         }
     });
-    filters.push({
-        filterName: 'Category',
-        filterOptions: allCategories,
-    },
+    filters.push(
+        {
+            filterName: 'Category',
+            filterOptions: allCategories,
+        },
         {
             filterName: 'Publisher',
             filterOptions: allPublishers,
-        },);
+        },
+        {
+            filterName: 'Sort By',
+            filterOptions: [
+                { optionName: 'Name (A-Z)' },
+                { optionName: 'Name (Z-A)' },
+                { optionName: 'Price (ASC)' },
+                { optionName: 'Price (DESC)' },
+            ]
+        });
     return filters;
 };
+
+function sortBy(array, criteria) {
+    if (criteria === 'Name (A-Z)') {
+        array.sort((a, b) => a.product_name.localeCompare(b.product_name));
+    } else if (criteria === 'Name (Z-A)') {
+        array.sort((a, b) => b.product_name.localeCompare(a.product_name));
+    } else if (criteria === 'Price (ASC)') {
+        array.sort((a, b) => a.price - b.price);
+    } else if (criteria === 'Price (DESC)') {
+        array.sort((a, b) => b.price - a.price);
+    }
+    return array;
+}
 
 async function isUserLoggedIn() {
     try {
@@ -50,7 +73,6 @@ async function loadCart() {
         const response = await fetch('/api/cart');
         const data = await response.json();
         cart = data.cart;
-        console.log(window.location.pathname);
         if (window.location.pathname !== '/checkoutPage.html') {
             updateCartDisplay();
         }
@@ -277,14 +299,26 @@ async function updateShoppingPage() {
         if (existingGamesContainer) {
             existingGamesContainer.remove();
         }
-
         displayedGames = gameList.filter((game) => {
-            if (selectedFilters.length !== 0) {
-                return selectedFilters.some((filter) => filter == game.publisher
+            const nonSortingFilters = selectedFilters.filter((filter) => filter !== 'Name (A-Z)' &&
+                filter !== 'Name (Z-A)' &&
+                filter !== 'Price (ASC)' &&
+                filter !== 'Price (DESC)')
+            if (nonSortingFilters.length !== 0) {
+                return nonSortingFilters.some((filter) => filter == game.publisher
                     || filter == game.genre || filter == game.category);
             }
             return true;
         });
+
+        const sortFilter = selectedFilters.find(filter =>
+            filter === 'Name (A-Z)' ||
+            filter === 'Name (Z-A)' ||
+            filter === 'Price (ASC)' ||
+            filter === 'Price (DESC)');
+        if (sortFilter) {
+            displayedGames = sortBy(displayedGames, sortFilter);
+        }
 
         const newGamesContainer = loadGamesContainer(displayedGames);
         homeContainer.appendChild(newGamesContainer);
@@ -361,14 +395,13 @@ async function updateCheckoutPage() {
             window.alert(stockError);
             window.location.href = '/shoppingPage';
         } else {
-            const updateStock = await fetch('api/product', {
+            await fetch('api/product', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(cart),
             });
-            console.log(updateStock);
             const orderPlacement = await fetch('api/orders', {
                 method: 'POST',
                 headers: {
