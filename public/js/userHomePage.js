@@ -251,10 +251,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         allUsers.forEach(user => {
             if (!user.isAdmin) {
                 const userInfo = document.createElement('div');
-                userInfo.innerHTML = `<ul>
-                <li>Username: ${user.username}</li>
-                <li>Email: ${user.username}</li>
-                </ul>
+                userInfo.innerHTML = `
+                <strong>Username:<strong> ${user.username}<br>
+                <strong>Email:<strong> ${user.email}<br>
                 <hr>`;
                 userDiv.append(userInfo);
             }
