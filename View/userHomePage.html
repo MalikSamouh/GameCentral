@@ -13,37 +13,56 @@
     <header>
         <a href="/">
             <div class="logo">
-              <img src="/images/gameStore.png" alt="Logo">
+                <img src="/images/gameStore.png" alt="Logo">
             </div>
-          </a>
-          <div class="top-right" id="top-right">
+        </a>
+        <div class="top-right" id="top-right">
             <div class="login-block" id="login-block">
-              <a href="/signinPage">Sign in</a>
-              <span>|</span>
-              <a href="/registerPage">Register</a>
-              <img src="/images/FlagofCanada.png" alt="Canadian Flag">
-              <span>CAD</span>
-            </div>
-          </div>
+                <a href="/signinPage">Sign in</a>
+                <span>|</span>
+                <a href="/registerPage">Register</a>
+                <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+                <span>CAD</span>
+            </div>     
+        </div>
     </header>
-    <body>
-        <div class="user-page">
-            <h1>Your Information</h1>
-            <div class="user-info">
-                <div class="username"><strong>Username:</strong> </div>
-                <div id="username"></div>
+    <div class="user-page">
+        <h1>Your Information</h1>
+        <div class="user-info">
+            <div class="username">
+                <strong>Username:</strong>
+                <span id="username"></span>
+                <button id="editUsernameButton" class="edit-button">✎</button><br>
             </div>
-            <div class="email-info">
-                <div class="email"><strong>Email:</strong>  </div>
-                <div id="email"></div>
+            <div class="email">
+                <strong>Email:</strong>
+                <span id="email"></span>
+                <button id="editEmailButton" class="edit-button">✎</button>
             </div>
-            <h1>Order List<hr></h1>
+        </div>
+
+        <div id="editFormContainer" style="display: none;">
+            <h2>Edit Your Information</h2>
+            <form id="editProfileForm">
+                <label for="editUsername">Username:</label>
+                <input type="text" id="editUsername" name="username" value="">
+
+                <label for="editEmail">Email:</label>
+                <input type="email" id="editEmail" name="email" value="">
+
+                <button type="submit">Update Profile</button>
+            </form>
+        </div>
+        <h1>Order List<hr></h1>
             <div id="orders-container">
                 <div class="order">
                 </div>
-            </div>        
-        </div>
-    </body>
+            </div>   
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', updateUserStatus);
+    </script>
 </body>
 
 </html>
