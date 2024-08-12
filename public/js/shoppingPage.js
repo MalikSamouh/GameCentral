@@ -357,6 +357,8 @@ async function updateCheckoutPage() {
         cartSummary.innerHTML = '';
         if (cart.length === 0) {
             cartSummary.textContent = "Your cart is empty.";
+            window.alert("Your cart is empty. Add something before checking out.");
+            window.location.href = '/shoppingPage';
         } else {
             cart.forEach(item => {
                 const itemElement = document.createElement('div');
