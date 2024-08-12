@@ -239,11 +239,28 @@ async function updateShoppingPage() {
     title.textContent = 'Game Catalogue';
     title.className = 'homepageTitle';
     document.body.appendChild(title);
+    const searchContainer = document.createElement('div'); //create a search bar
+    searchContainer.className = 'searchContainer';
+
+    const searchInput = document.createElement('input'); 
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search games...';
+    searchInput.id = 'searchInput';
+
+    const searchButton = document.createElement('button');
+    searchButton.textContent = 'Search';
+    searchButton.className = 'searchButton';
+    searchButton.onclick = () => performSearch(gameList);
+
+    searchContainer.appendChild(searchInput);
+    searchContainer.appendChild(searchButton);
+
     let displayedGames = gameList;
 
     // LOAD FILTERS
     const filterContainer = document.createElement('div');
     filterContainer.className = 'filters';
+    filterContainer.appendChild(searchContainer); //append search
     const selectedFilters = [];
     const filterList = getFilter(gameList);
     filterList.forEach(filter => {
@@ -298,7 +315,7 @@ async function updateShoppingPage() {
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Apply Filters';
     confirmButton.className = 'confirmButton'
-    confirmButton.addEventListener("click", () => {
+    confirmButton.addEventListener("click", () => {    
         const existingGamesContainer = document.querySelector('.games');
         if (existingGamesContainer) {
             existingGamesContainer.remove();
@@ -338,6 +355,25 @@ async function updateShoppingPage() {
     document.body.appendChild(homeContainer);
     
 };
+
+function performSearch(gameList) {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+    // Filter the games based on the search input
+    const filteredGames = gameList.filter(game => 
+        game.product_name.toLowerCase().includes(searchInput) ||
+        game.publisher.toLowerCase().includes(searchInput) ||
+        game.category.toLowerCase().includes(searchInput)
+    );
+
+    let container = document.getElementsByClassName('games');
+    if (container.length > 0) {
+        container[0].innerHTML = ''; 
+        const newValue = loadGamesContainer(filteredGames); 
+        container[0].innerHTML = newValue.innerHTML;
+    }
+}
+
 
 // CHECKOUT PAGE
 
