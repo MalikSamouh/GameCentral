@@ -90,3 +90,15 @@ exports.loadCart = async (userId) => {
     throw error;
   }
 };
+
+exports.clearCart = async (userId) => {
+  try {
+    await Cart.findOneAndUpdate(
+      { user: userId },
+      { $set: { items: [] } }
+    );
+  } catch (error) {
+    console.error('Error clearing cart:', error);
+    throw error;
+  }
+};
