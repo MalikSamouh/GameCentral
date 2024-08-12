@@ -50,7 +50,8 @@ async function loadCart() {
         const response = await fetch('/api/cart');
         const data = await response.json();
         cart = data.cart;
-        if (!window.location.pathname === '/checkoutPage.html') {
+        console.log(window.location.pathname);
+        if (window.location.pathname !== '/checkoutPage.html') {
             updateCartDisplay();
         }
     } catch (error) {
@@ -151,8 +152,12 @@ const loadGamesContainer = (displayedGames) => {
         gamesDesc.appendChild(gameName);
 
         const gamePublisher = document.createElement('div');
-        gamePublisher.textContent = game.description;
+        gamePublisher.textContent = game.publisher;
         gamesDesc.appendChild(gamePublisher);
+
+        const avalableInStock = document.createElement('div');
+        avalableInStock.textContent = `Available in stock: ${game.quantity_in_stock}`;
+        gamesDesc.appendChild(avalableInStock);
 
         const gamePrice = document.createElement('div');
         gamePrice.textContent = '$' + game.price;
@@ -161,7 +166,9 @@ const loadGamesContainer = (displayedGames) => {
 
         const addButton = document.createElement('button');
         addButton.textContent = 'Add to Cart';
-        addButton.onclick = () => addToCart(game.product_name, displayedGames);
+        addButton.onclick = () => {
+            addToCart(game.product_name, displayedGames);
+        };
         gamesDesc.appendChild(addButton);
 
         gamesDiv.appendChild(gamesDesc);
@@ -169,7 +176,6 @@ const loadGamesContainer = (displayedGames) => {
     });
     return gamesContainer;
 };
-
 async function updateShoppingPage() {
     const cartModal = document.getElementById("cartModal");
     const cartButton = document.getElementById("cartButton");
@@ -199,7 +205,6 @@ async function updateShoppingPage() {
             window.location.href = "/checkoutPage.html";
         };
     }
-
 
     const gameList = await getGameList();
     const homeContainer = document.createElement('div');
@@ -248,7 +253,6 @@ async function updateShoppingPage() {
                 }
             });
         });
-        // plus button that opens the dropdown list
         const plusSign = document.createElement('button');
         plusSign.textContent = '+';
         plusSign.className = 'filterPlusButton'
@@ -264,30 +268,30 @@ async function updateShoppingPage() {
         filterDiv.appendChild(plusSign);
         filterContainer.appendChild(filterDiv);
         filterContainer.appendChild(filterOptions);
-        // confirm filters button
-        filterContainer.appendChild(filterDiv);
-        filterContainer.appendChild(filterOptions);
     });
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Apply Filters';
     confirmButton.className = 'confirmButton'
     confirmButton.addEventListener("click", () => {
+        const existingGamesContainer = document.querySelector('.games');
+        if (existingGamesContainer) {
+            existingGamesContainer.remove();
+        }
+        
         displayedGames = gameList.filter((game) => {
             if (selectedFilters.length !== 0) {
                 return selectedFilters.some((filter) => filter == game.publisher
-                    || filter == game.genre || filter == game.category)
+                    || filter == game.genre || filter == game.category);
             }
-            return gameList;
+            return true;
         });
-        let container = document.getElementsByClassName('games');
-        container[0].innerHTML = '';
-        const newValue = loadGamesContainer(displayedGames);
-        container[0].innerHTML = newValue.innerHTML;
+
+        const newGamesContainer = loadGamesContainer(displayedGames);
+        homeContainer.appendChild(newGamesContainer);
     });
     filterContainer.appendChild(confirmButton);
     homeContainer.appendChild(filterContainer);
 
-    // games
     const gamesContainer = loadGamesContainer(gameList);
     homeContainer.appendChild(gamesContainer);
 
@@ -343,6 +347,13 @@ async function updateCheckoutPage() {
             cart: cart,
             totalPrice: totalPrice,
         };
+        const updateStock = await fetch('api/product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formValues),
+        });
         const orderPlacement = await fetch('api/orders', {
             method: 'POST',
             headers: {

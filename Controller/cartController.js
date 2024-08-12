@@ -62,6 +62,7 @@ exports.getCart = async (req, res) => {
       req.session.cart = [];
     }
     res.status(200).json({ cart: req.session.cart });
+    console.log(req.session.cart);
   } catch (error) {
     console.error('Error getting cart:', error);
     res.status(500).json({ message: 'Error getting cart' });

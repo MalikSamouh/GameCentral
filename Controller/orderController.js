@@ -16,7 +16,6 @@ exports.putOrder = async (req, res) => {
             postalCode,
             country,
         };
-        console.log(userFullAdress);
         const order = new Order({
           user,
           items: cart,
@@ -24,7 +23,6 @@ exports.putOrder = async (req, res) => {
           status: false,
           user_address: userFullAdress,
         });
-        console.log(order);
         await order.save();
         res.status(200).send(order);
       } catch (error) {
