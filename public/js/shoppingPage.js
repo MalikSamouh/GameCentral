@@ -68,6 +68,7 @@ async function isUserLoggedIn() {
 
 //initialize the cart array
 
+// test
 async function loadCart() {
     try {
         const response = await fetch('/api/cart');
