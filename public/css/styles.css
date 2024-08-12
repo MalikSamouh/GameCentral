@@ -212,10 +212,6 @@ body {
   padding: 20px;
   border: 1px solid #888;
   width: 30%;
-  position: absolute; /* Position relative to its container (in this case, the modal background) */
-            top: 50%; /* Position from the top of the container */
-            left: 50%; /* Position from the left of the container */
-            transform: translate(-50%, -50%);
 }
 
 .close {
