@@ -170,11 +170,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     span.onclick = function () {
         editFormContainer.style.display = "none";
     }
+    window.editUser = function(userId) {
+        console.log('Editing user:', userId); // Debugging line
+        fetch(`/api/users/${userId}`)
+            .then(response => response.json())
+            .then(user => {
+                // Populate the modal with the user data
+                document.getElementById('editUserId').value = user._id;
+                document.getElementById('editUserUsername').value = user.username;
+                document.getElementById('editUserEmail').value = user.email;
+    
+                // Display the modal
+                const editUserModal = document.getElementById('editUserModal');
+                editUserModal.style.display = 'block';
+            })
+            .catch(error => console.error('Error fetching user:', error));
+    };
+    
+    
+       
+    
+    console.log('Attaching event listeners to edit buttons');
+
+    const editButtons = document.querySelectorAll('.edit-user-button');
+    editButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log('Edit button clicked');
+            alert('Edit button clicked');  // Just for testing
+            const userId = event.target.getAttribute('data-user-id');
+            console.log('Editing user with ID:', userId);
+            editUser(userId);
+        });
+    });
+    
+    
     window.onclick = function (event) {
-        if (event.target == editFormContainer) {
-            editFormContainer.style.display = "none";
+        const editUserModal = document.getElementById('editUserModal');
+        if (event.target == editUserModal) {
+            editUserModal.style.display = 'none';
         }
     }
+    
+    
+    
 
     const profileForm = document.getElementById('editProfileForm');
     profileForm.addEventListener('submit', async function (event) {
@@ -286,18 +324,56 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         const userDiv = document.getElementById('adminUserList');
         userDiv.style.display = "block";
-        const allUsersBody = await fetch('api/users');
+        const allUsersBody = await fetch('/api/users');
         const allUsers = await allUsersBody.json();
         allUsers.forEach(user => {
             if (!user.isAdmin) {
                 const userInfo = document.createElement('div');
                 userInfo.innerHTML = `
-                <strong>Username:<strong> ${user.username}<br>
-                <strong>Email:<strong> ${user.email}<br>
-                <hr>`;
+                    <strong>Username:</strong> ${user.username}<br>
+                    <strong>Email:</strong> ${user.email}<br>
+                    <button class="edit-user-button" data-user-id="${user._id}" onclick="editUser('${user._id}')">Edit</button>
+                    <hr>`;
                 userDiv.append(userInfo);
             }
         });
+        
+        
+        
     }
+    document.getElementById('editUserForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        
+        const userId = document.getElementById('editUserId').value;
+        const updatedUsername = document.getElementById('editUserUsername').value;
+        const updatedEmail = document.getElementById('editUserEmail').value;
+        
+        try {
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: updatedUsername,
+                    email: updatedEmail,
+                })
+            });
+    
+            if (response.ok) {
+                alert('User information updated successfully!');
+                document.getElementById('editUserModal').style.display = 'none';
+                window.location.reload();  // Reload the page to reflect the changes
+            } else {
+                alert('Failed to update user information.');
+            }
+        } catch (error) {
+            console.error('Error updating user:', error);
+        }
+    });
+    
+    
+
+    
     await displayOrderDetails(userLoggedIn);
 });
