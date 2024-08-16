@@ -18,44 +18,117 @@
         </a>
         <div class="top-right" id="top-right">
             <div class="login-block" id="login-block">
-              <a href="/signinPage">Sign in</a>
-              <span>|</span>
-              <a href="/registerPage">Register</a>
-              <img src="/images/FlagofCanada.png" alt="Canadian Flag">
-              <span>CAD</span>
+                <a href="/signinPage">Sign in</a>
+                <span>|</span>
+                <a href="/registerPage">Register</a>
+                <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+                <span>CAD</span>
             </div>
             <button class="cartButton" id="cartButton">
-              <img src="/images/shoppingCartEmpty.png" alt="Shopping Cart" class="shoppingCart" id="shoppingCartIcon">
+                <img src="/images/shoppingCartEmpty.png" alt="Shopping Cart" class="shoppingCart" id="shoppingCartIcon">
             </button>
-          </div>
+        </div>
     </header>
     <div class="user-page">
-        <h1>Your Information</h1>
+        <div class="userheader">
+            <h1>Your Information</h1>
+            <button id="editUsernameButton" class="edit-button">✎</button><br>
+        </div>
         <div class="user-info">
             <div class="username">
                 <strong>Username:</strong>
                 <span id="username"></span>
-                <button id="editUsernameButton" class="edit-button">✎</button><br>
-            </div>
+            </div><br>
             <div class="email">
                 <strong>Email:</strong>
                 <span id="email"></span>
-                <button id="editEmailButton" class="edit-button">✎</button>
+            </div>
+            <div class="address">
+                <strong>Address:</strong>
+                <span id="address"></span>
+            </div>
+            <div class="city">
+                <strong>City:</strong>
+                <span id="city"></span>
+            </div>
+            <div class="state">
+                <strong>State:</strong>
+                <span id="state"></span>
+            </div>
+            <div class="country">
+                <strong>Country:</strong>
+                <span id="country"></span>
+            </div>
+            <div class="postalCode">
+                <strong>Postal Code:</strong>
+                <span id="postalCode"></span>
+            </div>
+            <div class="cardInfo">
+                <strong>Card Information:</strong>
+                <div>
+                    <strong>Name on Card:</strong>
+                    <span id="nameOnCard"></span>
+                </div>
+                <div>
+                    <strong>Card Number:</strong>
+                    <span id="cardNumber"></span>
+                </div>
+                <div>
+                    <strong>CVV:</strong>
+                    <span id="cvv"></span>
+                </div>
+                <div>
+                    <strong>Expiry Date:</strong>
+                    <span id="expiryDate"></span>
+                </div>
             </div>
         </div>
 
-        <div id="editFormContainer" style="display: none;">
-            <h2>Edit Your Information</h2>
-            <form id="editProfileForm">
-                <label for="editUsername">Username:</label>
-                <input type="text" id="editUsername" name="username" value="">
+        <div id="editFormModal">
+            <div class="modal-content">
+                <span class="editClose">&times;</span>
+                <h2>Edit Your Information</h2>
+                <form id="editProfileForm">
+                    <label for="editUsername">Username:</label>
+                    <input type="text" id="editUsername" name="username" value="">
 
-                <label for="editEmail">Email:</label>
-                <input type="email" id="editEmail" name="email" value="">
+                    <label for="editEmail">Email:</label>
+                    <input type="email" id="editEmail" name="email" value="">
 
-                <button type="submit">Update Profile</button>
-            </form>
+                    <label for="editAddress">Address:</label>
+                    <input type="text" id="editAddress" name="address" value="">
+
+                    <label for="editCity">City:</label>
+                    <input type="text" id="editCity" name="city" value="">
+
+                    <label for="editState">State:</label>
+                    <input type="text" id="editState" name="state" value="">
+
+                    <label for="editCountry">Country:</label>
+                    <input type="text" id="editCountry" name="country" value="">
+
+                    <label for="editPostalCode">Postal Code:</label>
+                    <input type="text" id="editPostalCode" name="postalCode" value="">
+
+                    <label for="editNameOnCard">Name on Card:</label>
+                    <input type="text" id="editNameOnCard" name="nameOnCard" value="">
+
+                    <label for="editCardNumber">Card Number:</label>
+                    <input type="text" id="editCardNumber" name="cardNumber" value=""
+                    inputmode="numeric" pattern="[0-9\s]{13,19}" maxlength="19">
+
+                    <label for="editCvv">CVV:</label>
+                    <input type="text" id="editCvv" name="cvv" value=""
+                    inputmode="numeric" pattern="[0-9\s]{3}" maxlength="3">
+
+                    <label for="editExpiryDate">Expiry Date:</label>
+                    <input type="text" id="editExpiryDate" name="expiryDate" value="">
+
+                    <button type="submit">Update Profile</button>
+                </form>
+            </div>
         </div>
+
 
         <button id="adminStockButton" class="adminStockButton">Restock Items</button>
 
@@ -69,7 +142,9 @@
             </div>
         </div>
         <div id="adminUserList" class="adminUserList">
-            <h2>Registered Users<hr></h2>
+            <h2>Registered Users
+                <hr>
+            </h2>
             <div id="adminUserListDiv" class="adminUserListDiv"></div>
         </div>
 

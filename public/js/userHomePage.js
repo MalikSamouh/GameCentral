@@ -133,35 +133,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/signinPage';
         return;
     } else {
-        const usernameContainer = document.getElementById('username');
-        usernameContainer.innerHTML = `${userLoggedIn.username}`
-        const emailContainer = document.getElementById('email');
-        emailContainer.innerHTML = `${userLoggedIn.email}`
+        document.getElementById('username').innerHTML = userLoggedIn.username;
+        document.getElementById('email').innerHTML = userLoggedIn.email;
+        document.getElementById('address').innerHTML = userLoggedIn.user.billingAddress;
+        document.getElementById('city').innerHTML = userLoggedIn.user.city;
+        document.getElementById('state').innerHTML = userLoggedIn.user.state;
+        document.getElementById('country').innerHTML = userLoggedIn.user.country;
+        document.getElementById('postalCode').innerHTML = userLoggedIn.user.postalCode;
+        document.getElementById('nameOnCard').innerHTML = userLoggedIn.user.nameOnCard;
+        document.getElementById('cardNumber').innerHTML = userLoggedIn.user.cardNumber;
+        document.getElementById('cvv').innerHTML = userLoggedIn.user.cvv;
+        document.getElementById('expiryDate').innerHTML = userLoggedIn.user.expiryDate;
 
-        document.getElementById('editUsername').value = userLoggedIn.username; //user edit
-        document.getElementById('editEmail').value = userLoggedIn.email; //email edit
+        document.getElementById('editUsername').value = userLoggedIn.username;
+        document.getElementById('editEmail').value = userLoggedIn.email;
+        document.getElementById('editAddress').value = userLoggedIn.user.billingAddress;
+        document.getElementById('editCity').value = userLoggedIn.user.city;
+        document.getElementById('editState').value = userLoggedIn.user.state;
+        document.getElementById('editCountry').value = userLoggedIn.user.country;
+        document.getElementById('editPostalCode').value = userLoggedIn.user.postalCode;
+        document.getElementById('editNameOnCard').value = userLoggedIn.user.nameOnCard;
+        document.getElementById('editCardNumber').value = userLoggedIn.user.cardNumber;
+        document.getElementById('editCvv').value = userLoggedIn.user.cvv;
+        document.getElementById('editExpiryDate').value = userLoggedIn.user.expiryDate;
+        
 
     }
     const editUsernameButton = document.getElementById('editUsernameButton'); //editing the user and email
-    const editEmailButton = document.getElementById('editEmailButton');
-    const editFormContainer = document.getElementById('editFormContainer');
+    const editFormContainer = document.getElementById('editFormModal');
 
     editUsernameButton.addEventListener('click', () => {
         editFormContainer.style.display = 'block';
         document.getElementById('editUsername').focus();
     });
-
-    editEmailButton.addEventListener('click', () => {
-        editFormContainer.style.display = 'block';
-        document.getElementById('editEmail').focus();
-    });
+    const span = document.getElementsByClassName("editClose")[0];
+    span.onclick = function () {
+        editFormContainer.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target == editFormContainer) {
+            editFormContainer.style.display = "none";
+        }
+    }
 
     const profileForm = document.getElementById('editProfileForm');
     profileForm.addEventListener('submit', async function (event) {
         event.preventDefault();
-
         const updatedUsername = document.getElementById('editUsername').value;
         const updatedEmail = document.getElementById('editEmail').value;
+        const updatedAddress = document.getElementById('editAddress').value;
+        const updatedCity = document.getElementById('editCity').value;
+        const updatedState = document.getElementById('editState').value;
+        const updatedCountry = document.getElementById('editCountry').value;
+        const updatedPostalCode = document.getElementById('editPostalCode').value;
+        const updatedNameOnCard = document.getElementById('editNameOnCard').value;
+        const updatedCardNumber = document.getElementById('editCardNumber').value;
+        const updatedCvv = document.getElementById('editCvv').value;
+        const updatedExpiryDate = document.getElementById('editExpiryDate').value;
 
         try {
             const response = await fetch('/api/updateProfile', {
@@ -169,7 +197,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username: updatedUsername, email: updatedEmail })
+                body: JSON.stringify({
+                    username: updatedUsername,
+                    email: updatedEmail,
+                    billingAddress: updatedAddress,
+                    city: updatedCity,
+                    state: updatedState,
+                    country: updatedCountry,
+                    postalCode: updatedPostalCode,
+                    nameOnCard: updatedNameOnCard,
+                    cardNumber: updatedCardNumber,
+                    cvv: updatedCvv,
+                    expiryDate: updatedExpiryDate,
+                })
             });
 
             if (response.ok) {
@@ -244,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.alert(`Restock Failed: ${newStock.error}`);
             }
         });
-        const userDiv = document.getElementById('adminUserListDiv');
+        const userDiv = document.getElementById('adminUserList');
         userDiv.style.display = "block";
         const allUsersBody = await fetch('api/users');
         const allUsers = await allUsersBody.json();

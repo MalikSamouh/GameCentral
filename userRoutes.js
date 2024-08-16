@@ -12,6 +12,7 @@ router.post('/signin', userController.loginUser);
 router.get('/checkLogin',userController.checkLogin);
 router.post('/logout', userController.logoutUser);
 router.get('/users', userController.getAllUsers);
+router.post('/updateProfile', userController.updateProfile);
 
 
 // Product routes

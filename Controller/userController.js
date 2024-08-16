@@ -7,7 +7,7 @@ const cartController = require('./cartController');
 
 exports.registerUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password, billingAddress, city, state, postalCode, country, nameOnCard, cardNumber, cvv, expiryDate  } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -23,6 +23,15 @@ exports.registerUser = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      billingAddress,
+      city,
+      state,
+      postalCode,
+      country,
+      nameOnCard, 
+      expiryDate, 
+      cvv,
+      cardNumber,
     });
 
     await newUser.save();
@@ -94,13 +103,14 @@ exports.logoutUser = async (req, res) => {
   }
 };
 
-exports.checkLogin = (req, res) => {
+exports.checkLogin = async (req, res) => {
   if (req.session.userId) {
     // (req.session);
-    res.json({ isLoggedIn: true, username: req.session.username, email: req.session.email });
-} else {
+    const user = await User.findOne({ username: req.session.username });
+    res.json({ isLoggedIn: true, username: req.session.username, email: req.session.email, user: user });
+  } else {
     res.json({ isLoggedIn: false });
-}
+  }
 };
 
 
@@ -113,9 +123,31 @@ exports.getUserProfile = (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-      const users = await User.find({});
-      res.status(200).send(users);
+    const users = await User.find({});
+    res.status(200).send(users);
   } catch (error) {
-      res.status(500).send(error.message);
+    res.status(500).send(error.message);
   }
 };
+
+exports.updateProfile = async (req, res) => {
+  const { username, email, address, city, state, country, postalCode, cardNumber, nameOnCard, cvv, expiryDate } = req.body;
+
+  try {
+    const userId = req.session.userId;
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+
+    await User.findByIdAndUpdate(userId, { username, email, billingAddress: address, city, postalCode, state, country, cardNumber, nameOnCard, cvv, expiryDate });
+
+    req.session.username = username;
+    req.session.email = email;
+
+    res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Failed to update profile' });
+  }
+};
+

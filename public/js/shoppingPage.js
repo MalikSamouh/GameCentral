@@ -407,6 +407,7 @@ async function getUserInfo() {
 async function updateCheckoutPage() {
     const userInfo = await getUserInfo();
     const cartSummary = document.getElementById('cartSummary');
+    const form = document.getElementById('payment-form');
     if (!userInfo.isLoggedIn) {
         window.location.href = '/signinPage';
         return;
@@ -429,6 +430,16 @@ async function updateCheckoutPage() {
             const totalElement = document.createElement('div');
             totalElement.textContent = `Total: $${totalPrice.toFixed(2)}`;
             cartSummary.appendChild(totalElement);
+            const billingAddress = document.getElementById('billingAddress');
+            billingAddress.value = `${userInfo.user.billingAddress}`;
+            const city = document.getElementById('city');
+            city.value = `${userInfo.user.city}`;
+            const state = document.getElementById('state');
+            state.value = `${userInfo.user.state}`;
+            const country = document.getElementById('country');
+            country.value = `${userInfo.user.country}`;
+            const postalCode = document.getElementById('postalCode');
+            postalCode.value = `${userInfo.user.postalCode}`;
         }
     }
     document.getElementById('payment-form').addEventListener('submit', async function (event) {

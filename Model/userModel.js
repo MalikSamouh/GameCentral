@@ -19,7 +19,31 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  address: {
+  billingAddress: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  state: {
+    type: String,
+  },
+  postalCode: {
+    type: String,
+  },
+  country: {
+    type: String,
+  },
+  cardNumber: {
+    type: Number,
+  },
+  nameOnCard: {
+    type: String,
+  },
+  cvv: {
+    type: Number,
+  },
+  expiryDate: {
     type: String,
   },
 });

@@ -216,7 +216,8 @@ button:hover,
 }
 
 .cartModal,
-.adminStockModal {
+.adminStockModal,
+#editFormModal {
   display: none;
   position: fixed;
   z-index: 1;
@@ -246,7 +247,8 @@ button:hover,
 }
 
 .close,
-.adminStockClose {
+.adminStockClose,
+.editClose {
   color: #aaa;
   float: right;
   font-size: 28px;
@@ -256,7 +258,9 @@ button:hover,
 .close:hover,
 .close:focus,
 .adminStockClose:hover,
-.adminStockClose:focus {
+.adminStockClose:focus,
+.editClose:hover,
+.editClose:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
@@ -312,15 +316,20 @@ button:hover,
   display: block;
 }
 
-.user-info,
-.email-info {
-  display: flex;
-}
-
 .adminStockButton {
   display: none;
 }
 
-.adminUserListDiv {
+.adminUserList {
   display: none;
+}
+
+.userheader {
+  display: flex;
+  align-items:first baseline;
+  button {
+    height: 100%;
+    margin-left: 3rem;
+    align-items: center;
+  }
 }
