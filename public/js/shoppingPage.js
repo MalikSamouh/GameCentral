@@ -440,6 +440,15 @@ async function updateCheckoutPage() {
             country.value = `${userInfo.user.country}`;
             const postalCode = document.getElementById('postalCode');
             postalCode.value = `${userInfo.user.postalCode}`;
+
+            const nameOnCard = document.getElementById('name');
+            nameOnCard.value = `${userInfo.user.nameOnCard}`;
+            const cardNumber = document.getElementById('card-number');
+            cardNumber.value = `${userInfo.user.cardNumber}`;
+            const cvv = document.getElementById('cvv');
+            cvv.value = `${userInfo.user.cvv}`;
+            const expiryDate = document.getElementById('expiry-date');
+            expiryDate.value = `${userInfo.user.expiryDate}`;
         }
     }
     document.getElementById('payment-form').addEventListener('submit', async function (event) {

@@ -14,10 +14,15 @@ exports.registerUser = async (req, res) => {
       return res.status(400).send('User already exists');
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).send('Password must be at least 8 characters long, contain a mix of uppercase and lowercase letters, include numbers and symbols.');
+    }
+
     const saltRounds = 10;
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    // console.log('Hashed password:', hashedPassword);
+    consol.log(admin)
 
     const newUser = new User({
       username,
