@@ -25,13 +25,11 @@ exports.putOrder = async (req, res) => {
         });
         await order.save();
 
-        // Clear the cart in the database
         await Cart.findOneAndUpdate(
             { user: user._id },
             { $set: { items: [] } }
         );
         
-        // Clear the cart in the session
         req.session.cart = [];
 
         res.status(200).json({ message: 'Order placed successfully', order });

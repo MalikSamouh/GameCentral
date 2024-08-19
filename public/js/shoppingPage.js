@@ -407,7 +407,6 @@ async function getUserInfo() {
 async function updateCheckoutPage() {
     const userInfo = await getUserInfo();
     const cartSummary = document.getElementById('cartSummary');
-    const form = document.getElementById('payment-form');
     if (!userInfo.isLoggedIn) {
         window.location.href = '/signinPage';
         return;
@@ -443,11 +442,11 @@ async function updateCheckoutPage() {
 
             const nameOnCard = document.getElementById('name');
             nameOnCard.value = `${userInfo.user.nameOnCard}`;
-            const cardNumber = document.getElementById('card-number');
+            const cardNumber = document.getElementById('cardNumber');
             cardNumber.value = `${userInfo.user.cardNumber}`;
             const cvv = document.getElementById('cvv');
             cvv.value = `${userInfo.user.cvv}`;
-            const expiryDate = document.getElementById('expiry-date');
+            const expiryDate = document.getElementById('expiryDate');
             expiryDate.value = `${userInfo.user.expiryDate}`;
         }
     }
@@ -483,6 +482,39 @@ async function updateCheckoutPage() {
                 },
                 body: JSON.stringify(cart),
             });
+            let newUserInfo = '';
+            if (userInfo.user.billingAddress !== formData.billingAddress ||
+            userInfo.user.city !== formData.city ||
+            userInfo.user.state !== (formData.state) || 
+            userInfo.user.country !== (formData.country) || 
+            userInfo.user.postalCode !== (formData.postalCode) ||
+            userInfo.user.nameOnCard !== (formData.name) ||
+            userInfo.user.cvv !== (formData.cvv) ||
+            userInfo.user.expiryDate !== (formData.expiryDate) ||
+            userInfo.user.cardNumber !== (formData.cardNumber)) {
+                const response = await fetch('/api/updateProfile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: userInfo.user.username,
+                        email: userInfo.user.email,
+                        billingAddress: formValues.billingAddress,
+                        city: formValues.city,
+                        state: formValues.state,
+                        country: formValues.country,
+                        postalCode: formValues.postalCode,
+                        nameOnCard: formValues.name,
+                        cardNumber: formValues.cardNumber,
+                        cvv: formValues.cvv,
+                        expiryDate: formValues.expiryDate,
+                    })
+                });
+                if (response.ok) {
+                    newUserInfo = '\n\nYour new payment information was saved.'
+            }
+        }
             const orderPlacement = await fetch('api/orders', {
                 method: 'POST',
                 headers: {
@@ -495,7 +527,7 @@ async function updateCheckoutPage() {
                 cart = [];
                 // Refresh the cart from the server
                 await loadCart();
-                window.alert('Order placed, thank you! You will be redirected to your profile now. You will see your order there.')
+                window.alert('Order placed, thank you! You will be redirected to your profile now. You will see your order there.' + newUserInfo)
                 window.location.href = '/profile';
             } else {
                 console.log(orderPlacement.error);

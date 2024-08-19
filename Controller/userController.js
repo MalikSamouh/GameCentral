@@ -22,7 +22,6 @@ exports.registerUser = async (req, res) => {
     const saltRounds = 10;
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    consol.log(admin)
 
     const newUser = new User({
       username,
@@ -139,28 +138,23 @@ exports.updateProfile = async (req, res) => {
   const { userId, username, email, address, city, state, country, postalCode, cardNumber, nameOnCard, cvv, expiryDate } = req.body;
 
   try {
-    // Check if the logged-in user is an admin or if they are updating their own profile
-    const currentUserId = req.session.userId;
-    const currentUser = await User.findById(currentUserId);
+    const currentUserName = req.session.username;
+    const updateFields = {};
 
-    if (!currentUser || (!currentUser.isAdmin && currentUserId !== userId)) {
-      return res.status(401).json({ message: 'Not authorized' });
-    }
+    updateFields.username = username;
+    updateFields.email = email;
+    updateFields.billingAddress = address;
+    updateFields.city = city;
+    updateFields.state = state;
+    updateFields.country = country;
+    updateFields.postalCode = postalCode;
+    updateFields.cardNumber = cardNumber;
+    updateFields.nameOnCard = nameOnCard;
+    updateFields.cvv = cvv;
+    updateFields.expiryDate = expiryDate;
 
     // Update the user's profile
-    await User.findByIdAndUpdate(userId, { 
-      username, 
-      email, 
-      billingAddress: address, 
-      city, 
-      postalCode, 
-      state, 
-      country, 
-      cardNumber, 
-      nameOnCard, 
-      cvv, 
-      expiryDate 
-    });
+    await User.findOneAndUpdate({username: currentUserName}, {$set: updateFields});
 
     res.status(200).json({ message: 'Profile updated successfully' });
   } catch (error) {

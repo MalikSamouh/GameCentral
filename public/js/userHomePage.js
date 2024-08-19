@@ -189,18 +189,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('editCardNumber').value = userLoggedIn.user.cardNumber;
         document.getElementById('editCvv').value = userLoggedIn.user.cvv;
         document.getElementById('editExpiryDate').value = userLoggedIn.user.expiryDate;
-        updateUserUI(userLoggedIn); // Function to update user info in the DOM
+        updateUserUI(userLoggedIn);
 
         await displayOrderDetails(userLoggedIn);
 
     }
-    const editUsernameButton = document.getElementById('editUsernameButton'); //editing the user and email
+    const editUsernameButton = document.getElementById('editUsernameButton');
     const editFormContainer = document.getElementById('editFormModal');
 
     editUsernameButton.addEventListener('click', () => {
         editFormContainer.style.display = 'block';
         document.getElementById('editUsername').focus();
-        handleProfileEditButton(); // Function to handle profile edit actions
+        handleProfileEditButton();
 
     });
     const span = document.getElementsByClassName("editClose")[0];
@@ -208,21 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         editFormContainer.style.display = "none";
     }
     window.editUser = function(userId) {
-        console.log('Editing user:', userId); // Debugging line
-    //    // fetch(`/api/users/${userId}`)
-    //         .then(response => response.json())
-    //         .then(user => {
-    //             // Populate the modal with the user data
-    //             document.getElementById('editUserId').value = user._id;
-    //             document.getElementById('editUserUsername').value = user.username;
-    //             document.getElementById('editUserEmail').value = user.email;
-    
-    //             // Display the modal
-    //             const editUserModal = document.getElementById('editUserModal');
-    //             editUserModal.style.display = 'block';
-    // //         })
-    //         .catch(error => console.error('Error fetching user:', error));
-
+        console.log('Editing user:', userId);
     document.getElementById('editUserId').value = user._id;
     document.getElementById('editUserUsername').value = user.username;
                 document.getElementById('editUserEmail').value = user.email;
@@ -236,13 +222,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         .then(response => response.json())
         .then(users => {
             const modalBody = document.getElementById('admin-edit-form');
-            modalBody.innerHTML = ''; // Clear previous content
+            modalBody.innerHTML = ''; 
 
             users.forEach(user => {
                 const userContainer = document.createElement('div');
                 userContainer.classList.add('user-container');
-
-                // User information fields
                 const fields = [
                     { label: 'Username', value: user.username, id: `username${user._id}` },
                     { label: 'Address', value: user.billingAddress, id: `address${user._id}` },
@@ -272,7 +256,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     userContainer.appendChild(document.createElement('br'));
                 });
 
-                // Edit button
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Edit';
                 editButton.className = 'edit-user-button';
@@ -286,17 +269,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                     if (isEditing) {
                         console.log('Saving changes for user:', userId);
-                        // Save the changes
                         saveUserChanges(userId).then(() => {
                             this.textContent = 'Edit';
-                            toggleFieldsEditable(false, userId);  // Disable fields after saving
+                            toggleFieldsEditable(false, userId); 
                             console.log('Changes saved, fields disabled.');
                         }).catch(error => {
                             console.error('Error saving changes:', error);
                         });
                     } else {
                         console.log('Enabling fields for editing');
-                        // Enable editing
                         toggleFieldsEditable(true, userId);
                         this.textContent = 'Save Changes';
                         console.log('Fields enabled, text changed to Save Changes.');
@@ -317,13 +298,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         handleModalClose(closeButton.closest('.modal'));
                     });
                 });
-                // Append user container and edit button
                 userContainer.appendChild(editButton);
                 modalBody.appendChild(userContainer);
                 modalBody.appendChild(document.createElement('hr'));
             });
 
-            // Event listeners for each edit button
             document.querySelectorAll('.edit-user-button').forEach(button => {
                 button.addEventListener('click', event => {
                     console.log('Edit button clicked');
@@ -332,8 +311,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         editUser(userId);
                 });
             });
-
-            // Show the modal
             const editModal = document.getElementById('adminEditModal');
             editModal.style.display = 'block';
         })
@@ -422,9 +399,6 @@ window.onclick = function (event) {
         }
     }
     
-    
-    
-
     const profileForm = document.getElementById('editProfileForm');
     profileForm.addEventListener('submit', async function (event) {
         event.preventDefault();
