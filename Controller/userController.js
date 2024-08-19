@@ -128,12 +128,14 @@ exports.getUserProfile = (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({});
-    res.status(200).send(users);
+      const users = await User.find({});
+      res.status(200).json(users);
   } catch (error) {
-    res.status(500).send(error.message);
+      console.error('Error fetching users:', error);
+      res.status(500).json({ message: 'Failed to fetch users' });
   }
 };
+
 
 exports.updateProfile = async (req, res) => {
   const { username, email, address, city, state, country, postalCode, cardNumber, nameOnCard, cvv, expiryDate } = req.body;

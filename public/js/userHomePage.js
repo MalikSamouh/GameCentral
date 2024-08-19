@@ -157,8 +157,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('editCvv').value = userLoggedIn.user.cvv;
         document.getElementById('editExpiryDate').value = userLoggedIn.user.expiryDate;
         
+        const users = await getUserList();
+        loadUsersContainer(users);
 
+        // Set up search button event listener
+        const searchButton = document.getElementById('searchButton');
+        searchButton.addEventListener('click', () => performUserSearch(users));
+
+        // Optionally, allow pressing 'Enter' to trigger search
+        // document.getElementById('searchInput').addEventListener('keyup', (event) => {
+        //     if (event.key === 'Enter') {
+        //         performUserSearch(users);
+        //     }
+        // });
     }
+
     const editUsernameButton = document.getElementById('editUsernameButton'); //editing the user and email
     const editFormContainer = document.getElementById('editFormModal');
 
@@ -301,3 +314,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await displayOrderDetails(userLoggedIn);
 });
+async function getUserList() {
+    try {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+        return users;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+}
+function loadUsersContainer(users) {
+    const userListDiv = document.getElementById('userList');
+    userListDiv.innerHTML = ''; // Clear existing users
+
+    users.forEach(user => {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'user-entry';
+        userDiv.innerHTML = `
+            <strong>Username:</strong> ${user.username}<br>
+            <strong>Email:</strong> ${user.email}<br>
+            <hr>
+        `;
+        userListDiv.appendChild(userDiv);
+    });
+}
+function performUserSearch(usersList) {
+    const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+    // Filter the users based on the search input
+    const filteredUsers = usersList.filter(user => 
+        user.username.toLowerCase().includes(searchInput) || 
+        user.email.toLowerCase().includes(searchInput)
+    );
+
+    // Clear the existing user list before appending the filtered users
+    const userListDiv = document.getElementById('userList');
+    userListDiv.innerHTML = ''; 
+
+   loadUsersContainer(filteredUsers); // Reload the filtered users
+}
+
