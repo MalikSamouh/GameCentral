@@ -22,7 +22,7 @@ exports.registerUser = async (req, res) => {
     const saltRounds = 10;
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    consol.log(admin)
+    // consol.log(admin)
 
     const newUser = new User({
       username,

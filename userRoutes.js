@@ -29,5 +29,8 @@ router.get('/cart', cartController.getCart);
 router.post('/orders', orderController.putOrder);
 router.get('/orders', orderController.getAllOrders);
 router.get('/orders/:id', orderController.getOrdersByUserId);
+router.put('/orders/:id', orderController.updateOrder);
+
+
 
 module.exports = router;
