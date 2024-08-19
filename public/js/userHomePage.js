@@ -1,7 +1,20 @@
+let isUpdating = false;
+
 async function updateUserStatus() {
+    if (isUpdating) {
+        console.log('Skipping updateUserStatus as it is already running');
+        return;
+    }
+    console.log('updateUserStatus function is running');
+    isUpdating = true;
+
     try {
         const response = await fetch('/api/checkLogin');
         const data = await response.json();
+
+        console.log('checkLogin response received:', response);
+
+        console.log('checkLogin data:', data);
 
         const userStatusDiv = document.getElementById('login-block');
 
@@ -68,7 +81,11 @@ async function updateUserStatus() {
     } catch (error) {
         console.error('Error fetching login status:', error);
     }
+    finally {
+        isUpdating = false;
+    }
 }
+document.addEventListener('DOMContentLoaded', updateUserStatus);
 
 async function isUserLoggedIn() {
     try {
@@ -126,6 +143,7 @@ async function displayOrderDetails(loggedUser) {
             innerHTML += `<li>${item.product[0].product_name} x ${item.quantity} = ${(item.quantity * item.product[0].price).toFixed(2)}</li>`;
         });
         innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price}<br><hr>`
+
         orderContainer.innerHTML = innerHTML;
         ordersContainer.appendChild(orderContainer);
     });
@@ -133,9 +151,16 @@ async function displayOrderDetails(loggedUser) {
 }
 
 // load content on page
-
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Page fully loaded. Fetching users and creating buttons.');
+    await fetchUsersAndCreateButtons();
+    console.log('Buttons created. Now attaching event listeners.');
+
+      const editButton = document.querySelector('.edit-user-button');
     updateUserStatus();
+
+    attachEditButtonListeners();
+
     const userLoggedIn = await isUserLoggedIn();
     if (!userLoggedIn.isLoggedIn) {
         window.location.href = '/signinPage';
@@ -164,7 +189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('editCardNumber').value = userLoggedIn.user.cardNumber;
         document.getElementById('editCvv').value = userLoggedIn.user.cvv;
         document.getElementById('editExpiryDate').value = userLoggedIn.user.expiryDate;
-        
+        updateUserUI(userLoggedIn); // Function to update user info in the DOM
+
+        await displayOrderDetails(userLoggedIn);
 
     }
     const editUsernameButton = document.getElementById('editUsernameButton'); //editing the user and email
@@ -173,6 +200,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     editUsernameButton.addEventListener('click', () => {
         editFormContainer.style.display = 'block';
         document.getElementById('editUsername').focus();
+        handleProfileEditButton(); // Function to handle profile edit actions
+
     });
     const span = document.getElementsByClassName("editClose")[0];
     span.onclick = function () {
@@ -201,6 +230,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
  };
  document.getElementById('adminEditButton').addEventListener('click', () => {
+    document.getElementById('adminEditModal').style.display = 'block';
+
     fetch('/api/users')
         .then(response => response.json())
         .then(users => {
@@ -208,184 +239,98 @@ document.addEventListener('DOMContentLoaded', async () => {
             modalBody.innerHTML = ''; // Clear previous content
 
             users.forEach(user => {
-                // Username label and input
-                const userLabel = document.createElement('label');
-                userLabel.setAttribute('for', `username${user._id}`);
-                userLabel.textContent = `Username: `;
+                const userContainer = document.createElement('div');
+                userContainer.classList.add('user-container');
+
+                // User information fields
+                const fields = [
+                    { label: 'Username', value: user.username, id: `username${user._id}` },
+                    { label: 'Address', value: user.billingAddress, id: `address${user._id}` },
+                    { label: 'City', value: user.city, id: `city${user._id}` },
+                    { label: 'State', value: user.state, id: `state${user._id}` },
+                    { label: 'Country', value: user.country, id: `country${user._id}` },
+                    { label: 'Postal Code', value: user.postalCode, id: `postalCode${user._id}` },
+                    { label: 'Name on Card', value: user.nameOnCard, id: `nameOnCard${user._id}` },
+                    { label: 'Card Number', value: user.cardNumber, id: `cardNumber${user._id}` },
+                    { label: 'CVV', value: user.cvv, id: `cvv${user._id}` },
+                    { label: 'Expiry Date', value: user.expiryDate, id: `expiryDate${user._id}` }
+                ];
+
+                fields.forEach(field => {
+                    const label = document.createElement('label');
+                    label.setAttribute('for', field.id);
+                    label.textContent = `${field.label}: `;
+                    
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'text');
+                    input.setAttribute('id', field.id);
+                    input.setAttribute('name', field.label.toLowerCase().replace(/\s/g, ''));
+                    input.setAttribute('value', field.value);
+
+                    userContainer.appendChild(label);
+                    userContainer.appendChild(input);
+                    userContainer.appendChild(document.createElement('br'));
+                });
+
+                // Edit button
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.className = 'edit-user-button';
+                editButton.setAttribute('data-user-id', user._id);
+                editButton.addEventListener('click', function() {
+                    const isEditing = this.textContent === 'Save Changes';
+                    const userId = this.getAttribute('data-user-id');
+                    
+                    console.log('Button clicked. Current mode:', isEditing ? 'Save Changes' : 'Edit');
+                    console.log('User ID:', userId);
                 
-                const userInput = document.createElement('input');
-                userInput.setAttribute('type', 'text');
-                userInput.setAttribute('id', `username${user._id}`);
-                userInput.setAttribute('name', `username`);
-                userInput.setAttribute('value', user.username);
+                    if (isEditing) {
+                        console.log('Saving changes for user:', userId);
+                        // Save the changes
+                        saveUserChanges(userId).then(() => {
+                            this.textContent = 'Edit';
+                            toggleFieldsEditable(false, userId);  // Disable fields after saving
+                            console.log('Changes saved, fields disabled.');
+                        }).catch(error => {
+                            console.error('Error saving changes:', error);
+                        });
+                    } else {
+                        console.log('Enabling fields for editing');
+                        // Enable editing
+                        toggleFieldsEditable(true, userId);
+                        this.textContent = 'Save Changes';
+                        console.log('Fields enabled, text changed to Save Changes.');
+                    }
+                });
                 
-                // Address label and input
-                const addressLabel = document.createElement('label');
-                addressLabel.setAttribute('for', `address${user._id}`);
-                addressLabel.textContent = `Address: `;
-                
-                const addressInput = document.createElement('input');
-                addressInput.setAttribute('type', 'text');
-                addressInput.setAttribute('id', `address${user._id}`);
-                addressInput.setAttribute('name', `address`);
-                addressInput.setAttribute('value', user.billingAddress);
-                
-                // City label and input
-                const cityLabel = document.createElement('label');
-                cityLabel.setAttribute('for', `city${user._id}`);
-                cityLabel.textContent = `City: `;
-                
-                const cityInput = document.createElement('input');
-                cityInput.setAttribute('type', 'text');
-                cityInput.setAttribute('id', `city${user._id}`);
-                cityInput.setAttribute('name', `city`);
-                cityInput.setAttribute('value', user.city);
-                
-                // State label and input
-                const stateLabel = document.createElement('label');
-                stateLabel.setAttribute('for', `state${user._id}`);
-                stateLabel.textContent = `State: `;
-                
-                const stateInput = document.createElement('input');
-                stateInput.setAttribute('type', 'text');
-                stateInput.setAttribute('id', `state${user._id}`);
-                stateInput.setAttribute('name', `state`);
-                stateInput.setAttribute('value', user.state);
-                
-                // Country label and input
-                const countryLabel = document.createElement('label');
-                countryLabel.setAttribute('for', `country${user._id}`);
-                countryLabel.textContent = `Country: `;
-                
-                const countryInput = document.createElement('input');
-                countryInput.setAttribute('type', 'text');
-                countryInput.setAttribute('id', `country${user._id}`);
-                countryInput.setAttribute('name', `country`);
-                countryInput.setAttribute('value', user.country);
-                
-                // Postal Code label and input
-                const postalCodeLabel = document.createElement('label');
-                postalCodeLabel.setAttribute('for', `postalCode${user._id}`);
-                postalCodeLabel.textContent = `Postal Code: `;
-                
-                const postalCodeInput = document.createElement('input');
-                postalCodeInput.setAttribute('type', 'text');
-                postalCodeInput.setAttribute('id', `postalCode${user._id}`);
-                postalCodeInput.setAttribute('name', `postalCode`);
-                postalCodeInput.setAttribute('value', user.postalCode);
-                
-                // Card Information
-                const nameOnCardLabel = document.createElement('label');
-                nameOnCardLabel.setAttribute('for', `nameOnCard${user._id}`);
-                nameOnCardLabel.textContent = `Name on Card: `;
-                
-                const nameOnCardInput = document.createElement('input');
-                nameOnCardInput.setAttribute('type', 'text');
-                nameOnCardInput.setAttribute('id', `nameOnCard${user._id}`);
-                nameOnCardInput.setAttribute('name', `nameOnCard`);
-                nameOnCardInput.setAttribute('value', user.nameOnCard);
-                
-                const cardNumberLabel = document.createElement('label');
-                cardNumberLabel.setAttribute('for', `cardNumber${user._id}`);
-                cardNumberLabel.textContent = `Card Number: `;
-                
-                const cardNumberInput = document.createElement('input');
-                cardNumberInput.setAttribute('type', 'text');
-                cardNumberInput.setAttribute('id', `cardNumber${user._id}`);
-                cardNumberInput.setAttribute('name', `cardNumber`);
-                cardNumberInput.setAttribute('value', user.cardNumber);
-                cardNumberInput.setAttribute('inputmode', 'numeric');
-                cardNumberInput.setAttribute('pattern', '[0-9\\s]{13,19}');
-                cardNumberInput.setAttribute('maxlength', '19');
-                
-                const cvvLabel = document.createElement('label');
-                cvvLabel.setAttribute('for', `cvv${user._id}`);
-                cvvLabel.textContent = `CVV: `;
-                
-                const cvvInput = document.createElement('input');
-                cvvInput.setAttribute('type', 'text');
-                cvvInput.setAttribute('id', `cvv${user._id}`);
-                cvvInput.setAttribute('name', `cvv`);
-                cvvInput.setAttribute('value', user.cvv);
-                cvvInput.setAttribute('inputmode', 'numeric');
-                cvvInput.setAttribute('pattern', '[0-9]{3}');
-                cvvInput.setAttribute('maxlength', '3');
-                
-                const expiryDateLabel = document.createElement('label');
-                expiryDateLabel.setAttribute('for', `expiryDate${user._id}`);
-                expiryDateLabel.textContent = `Expiry Date: `;
-                
-                const expiryDateInput = document.createElement('input');
-                expiryDateInput.setAttribute('type', 'text');
-                expiryDateInput.setAttribute('id', `expiryDate${user._id}`);
-                expiryDateInput.setAttribute('name', `expiryDate`);
-                expiryDateInput.setAttribute('value', user.expiryDate);
-                
-                // Append to modal body
-                modalBody.appendChild(userLabel);
-                modalBody.appendChild(userInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(addressLabel);
-                modalBody.appendChild(addressInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(cityLabel);
-                modalBody.appendChild(cityInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(stateLabel);
-                modalBody.appendChild(stateInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(countryLabel);
-                modalBody.appendChild(countryInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(postalCodeLabel);
-                modalBody.appendChild(postalCodeInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(nameOnCardLabel);
-                modalBody.appendChild(nameOnCardInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(cardNumberLabel);
-                modalBody.appendChild(cardNumberInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(cvvLabel);
-                modalBody.appendChild(cvvInput);
-                modalBody.appendChild(document.createElement('br'));
-                modalBody.appendChild(expiryDateLabel);
-                modalBody.appendChild(expiryDateInput);
-                modalBody.appendChild(document.createElement('br'));
+                function toggleFieldsEditable(editable, userId) {
+                    const fields = document.querySelectorAll(`#username${userId}, #address${userId}, #city${userId}, #state${userId}, #country${userId}, #postalCode${userId}, #nameOnCard${userId}, #cardNumber${userId}, #cvv${userId}, #expiryDate${userId}`);
+                    fields.forEach(field => {
+                        field.disabled = !editable;
+                    });
+                }
+                function handleModalClose(modalElement) {
+                    modalElement.style.display = 'none';
+                }
+                document.querySelectorAll('.modal-close').forEach(closeButton => {
+                    closeButton.addEventListener('click', function() {
+                        handleModalClose(closeButton.closest('.modal'));
+                    });
+                });
+                // Append user container and edit button
+                userContainer.appendChild(editButton);
+                modalBody.appendChild(userContainer);
+                modalBody.appendChild(document.createElement('hr'));
             });
 
-            // Save Changes button
-            const saveButton = document.createElement('button');
-            saveButton.setAttribute('type', 'submit');
-            saveButton.textContent = 'Save Changes';
-            saveButton.className = 'edit-button';
-            saveButton.id = 'saveEditButton';
-            modalBody.appendChild(saveButton);
-
-            // Event listener for submitting the form
-            document.getElementById('admin-edit-form').addEventListener('submit', async function (event) {
-                event.preventDefault();
-                const formData = new FormData(event.target);
-                const formValues = Object.fromEntries(formData.entries());
-                const values = {
-                    values: Object.entries(formValues).map(([key, value]) => ({
-                        user_id: key,
-                        updated_value: value,
-                    }))
-                };
-                const updateUser = await fetch('/api/users', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(values),
+            // Event listeners for each edit button
+            document.querySelectorAll('.edit-user-button').forEach(button => {
+                button.addEventListener('click', event => {
+                    console.log('Edit button clicked');
+        const userId = event.target.getAttribute('data-user-id');
+        console.log('Editing user with ID:', userId);
+        editUser(userId);
                 });
-                if (updateUser.ok) {
-                    window.alert('User information updated successfully');
-                    window.location.href = '/profile';
-                } else {
-                    window.alert(`Update Failed: ${updateUser.error}`);
-                }
             });
 
             // Show the modal
@@ -394,6 +339,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
         .catch(error => console.error('Error fetching users:', error));
 });
+
+
+
+async function saveUserChanges(userId) {
+    console.log("saveUserChanges function called for user ID:", userId);
+
+    const updatedUser = {
+        username: document.getElementById(`username${userId}`).value,
+        billingAddress: document.getElementById(`address${userId}`).value,
+        city: document.getElementById(`city${userId}`).value,
+        state: document.getElementById(`state${userId}`).value,
+        country: document.getElementById(`country${userId}`).value,
+        postalCode: document.getElementById(`postalCode${userId}`).value,
+        nameOnCard: document.getElementById(`nameOnCard${userId}`).value,
+        cardNumber: document.getElementById(`cardNumber${userId}`).value,
+        cvv: document.getElementById(`cvv${userId}`).value,
+        expiryDate: document.getElementById(`expiryDate${userId}`).value
+    };
+
+    console.log("Updated user data being sent:", updatedUser);
+
+    try {
+        const response = await fetch(`/api/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedUser)
+        });
+
+        if (response.ok) {
+            console.log('User information updated successfully!');
+            alert('User information updated successfully!');
+            window.location.reload(); // Reload the page to reflect the changes
+        } else {
+            const errorData = await response.json();
+            console.error('Failed to update user information:', errorData);
+            alert('Failed to update user information.');
+        }
+    } catch (error) {
+        console.error('Error updating user:', error);
+        alert('An error occurred while updating user information.');
+    }
+}
+
 
 // Close the modal when the 'x' is clicked
 const closeEditModalSpan = document.getElementsByClassName("adminEditClose")[0];
@@ -409,14 +399,11 @@ window.onclick = function (event) {
     }
 }
 
-
-
-    
-       
     
     console.log('Attaching event listeners to edit buttons');
 
     const editButtons = document.querySelectorAll('.edit-user-button');
+    
     editButtons.forEach(button => {
         button.addEventListener('click', (event) => {
             console.log('Edit button clicked');
@@ -595,8 +582,98 @@ window.onclick = function (event) {
         }
     });
     
-    
+    await fetchUsersAndCreateButtons();
 
-    
+
+    attachEditButtonListeners();
+
     await displayOrderDetails(userLoggedIn);
 });
+//from here
+async function fetchUsersAndCreateButtons() {
+    try {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+        const modalBody = document.getElementById('admin-edit-form');
+
+        users.forEach(user => {
+            const userContainer = document.createElement('div');
+            userContainer.classList.add('user-container');
+
+            // Creating an edit button for each user
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.className = 'edit-user-button';
+            editButton.setAttribute('data-user-id', user._id);
+
+            userContainer.appendChild(editButton);
+            modalBody.appendChild(userContainer);
+        });
+
+        console.log('Buttons created.');
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+}
+
+function attachEditButtonListeners() {
+    console.log('Attaching event listeners to edit buttons');
+    const editButtons = document.querySelectorAll('.edit-user-button');
+
+    if (editButtons.length === 0) {
+        console.error('No edit buttons found!');
+        return;
+    }
+
+    editButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log('Edit button clicked');
+            alert('Edit button clicked'); // Testing feedback
+            const userId = event.target.getAttribute('data-user-id');
+            console.log('Editing user with ID:', userId);
+            editUser(userId);
+        });
+    });
+}
+
+function handleProfileEditButton() {
+    const editUsernameButton = document.getElementById('editUsernameButton');
+    const editFormContainer = document.getElementById('editFormModal');
+
+    editUsernameButton.addEventListener('click', () => {
+        editFormContainer.style.display = 'block';
+        document.getElementById('editUsername').focus();
+    });
+
+    const span = document.getElementsByClassName("editClose")[0];
+    span.onclick = function () {
+        editFormContainer.style.display = "none";
+    }
+}
+
+function updateUserUI(userLoggedIn) {
+    document.getElementById('username').innerHTML = userLoggedIn.username;
+    document.getElementById('email').innerHTML = userLoggedIn.email;
+    document.getElementById('address').innerHTML = userLoggedIn.user.billingAddress;
+    document.getElementById('city').innerHTML = userLoggedIn.user.city;
+    document.getElementById('state').innerHTML = userLoggedIn.user.state;
+    document.getElementById('country').innerHTML = userLoggedIn.user.country;
+    document.getElementById('postalCode').innerHTML = userLoggedIn.user.postalCode;
+    document.getElementById('nameOnCard').innerHTML = userLoggedIn.user.nameOnCard;
+    document.getElementById('cardNumber').innerHTML = userLoggedIn.user.cardNumber;
+    document.getElementById('cvv').innerHTML = userLoggedIn.user.cvv;
+    document.getElementById('expiryDate').innerHTML = userLoggedIn.user.expiryDate;
+
+    // Pre-fill form fields with user data
+    document.getElementById('editUsername').value = userLoggedIn.username;
+    document.getElementById('editEmail').value = userLoggedIn.email;
+    document.getElementById('editAddress').value = userLoggedIn.user.billingAddress;
+    document.getElementById('editCity').value = userLoggedIn.user.city;
+    document.getElementById('editState').value = userLoggedIn.user.state;
+    document.getElementById('editCountry').value = userLoggedIn.user.country;
+    document.getElementById('editPostalCode').value = userLoggedIn.user.postalCode;
+    document.getElementById('editNameOnCard').value = userLoggedIn.user.nameOnCard;
+    document.getElementById('editCardNumber').value = userLoggedIn.user.cardNumber;
+    document.getElementById('editCvv').value = userLoggedIn.user.cvv;
+    document.getElementById('editExpiryDate').value = userLoggedIn.user.expiryDate;
+}

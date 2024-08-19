@@ -3,6 +3,7 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const path = require('path');
 const userRoutes = require('./userRoutes');
+const router = express.Router();
 const User = require('./Model/userModel');
 
 const cors = require('cors');
@@ -19,6 +20,12 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false }
 }));
+
+app.get('/aboutUsPage', (req, res) => {
+  res.sendFile(path.join(__dirname, 'View', 'aboutUsPage.html'));
+});
+
+
 
 mongoose.connect('mongodb+srv://testing:8gW6ByBqL36rrzoJ@ecommerce.zzyeljs.mongodb.net/', {
   useNewUrlParser: true,
@@ -68,6 +75,7 @@ const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
 
 
 

@@ -163,3 +163,39 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Failed to update profile' });
   }
 };
+// Controller/userController.js
+
+//const User = require('../Model/userModel');
+
+exports.updateUserById = async (req, res) => {
+    const userId = req.params.userId;
+    const updatedUserData = req.body;
+    console.log('Update Request for User ID:', userId);
+    console.log('Updated Data:', updatedUserData);
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        // Update user fields
+        user.username = updatedUserData.username || user.username;
+        user.billingAddress = updatedUserData.billingAddress || user.billingAddress;
+        user.city = updatedUserData.city || user.city;
+        user.state = updatedUserData.state || user.state;
+        user.country = updatedUserData.country || user.country;
+        user.postalCode = updatedUserData.postalCode || user.postalCode;
+        user.nameOnCard = updatedUserData.nameOnCard || user.nameOnCard;
+        user.cardNumber = updatedUserData.cardNumber || user.cardNumber;
+        user.cvv = updatedUserData.cvv || user.cvv;
+        user.expiryDate = updatedUserData.expiryDate || user.expiryDate;
+
+        await user.save();
+        console.log('User updated successfully');
+
+        res.status(200).send({ message: 'User updated successfully' });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).send({ message: 'Failed to update user information' });
+    }
+};
