@@ -120,36 +120,128 @@ async function addOrder(orders) {
 
 async function displayOrderDetails(loggedUser) {
     const detailsDiv = document.getElementById('orders-container');
-    const ordersContainer = document.createElement('div');
+    detailsDiv.innerHTML = ''; // Clear existing content
     const ordersFetch = await getOrders(loggedUser);
     const orders = await ordersFetch.json();
     if (orders.length === 0) {
-        ordersContainer.innerHTML = `<strong> You do not have orders. <a href="/shoppingPage">Make one.</a></strong>`;
+        detailsDiv.innerHTML = `<strong>You do not have orders. <a href="/shoppingPage">Make one.</a></strong>`;
+        return;
     }
-    orders.forEach(order => {
+
+    orders.forEach((order, index) => {
         const orderContainer = document.createElement('div');
-        const orderDate = new Date(order.createdAt); // Convert the timestamp to a readable date
+        orderContainer.className = 'order-container';
+        const orderDate = new Date(order.createdAt);
         let innerHTML = `
-            <strong>Order Date:</strong> ${orderDate.toLocaleString()}<br>
-            <strong>Receiver:</strong> ${order.user.username} (${order.user.email})<br>
-            <strong>Address:</strong> ${order.user_address.address}<br>
-            <strong>City:</strong> ${order.user_address.city}<br>
-            <strong>State:</strong> ${order.user_address.state}<br>
-            <strong>Postal Code:</strong> ${order.user_address.postalCode}<br>
-            <strong>Country:</strong> ${order.user_address.country}<br>
-            <strong>Status:</strong> ${order.status ? 'Delivered' : 'In progress'}<br>
-            <strong>Items:</strong> <ul>`;
+            <div class="order-details" id="order-${index}">
+                <strong>Order Date:</strong> ${orderDate.toLocaleString()}<br>
+                <strong>Receiver:</strong> <span class="editable" data-field="username">${order.user.username}</span> (<span class="editable" data-field="email">${order.user.email}</span>)<br>
+                <strong>Address:</strong> <span class="editable" data-field="address">${order.user_address.address}</span><br>
+                <strong>City:</strong> <span class="editable" data-field="city">${order.user_address.city}</span><br>
+                <strong>State:</strong> <span class="editable" data-field="state">${order.user_address.state}</span><br>
+                <strong>Postal Code:</strong> <span class="editable" data-field="postalCode">${order.user_address.postalCode}</span><br>
+                <strong>Country:</strong> <span class="editable" data-field="country">${order.user_address.country}</span><br>
+                <strong>Status:</strong> <span class="editable" data-field="status">${order.status ? 'Delivered' : 'In progress'}</span><br>
+                <strong>Items:</strong> <ul>
+        `;
         order.items.forEach(item => {
             innerHTML += `<li>${item.product[0].product_name} x ${item.quantity} = ${(item.quantity * item.product[0].price).toFixed(2)}</li>`;
         });
-        innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price}<br><hr>`
-
+        innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price}<br>`;
+        
+        if (loggedUser.email === 'admin@gmail.com') {
+            innerHTML += `
+                <button class="edit-order-btn" data-order-id="${order._id}" data-order-index="${index}">Edit Order</button>
+                <button class="save-order-btn" data-order-id="${order._id}" data-order-index="${index}" style="display:none;">Save Changes</button>
+            `;
+        }
+        
+        innerHTML += `<hr>`;
         orderContainer.innerHTML = innerHTML;
-        ordersContainer.appendChild(orderContainer);
+        detailsDiv.appendChild(orderContainer);
     });
-    detailsDiv.append(ordersContainer);
+
+    if (loggedUser.email === 'admin@gmail.com') {
+        addEditFunctionality();
+    }
 }
 
+function addEditFunctionality() {
+    const editButtons = document.querySelectorAll('.edit-order-btn');
+    const saveButtons = document.querySelectorAll('.save-order-btn');
+
+    editButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const orderId = event.target.dataset.orderId;
+            const orderIndex = event.target.dataset.orderIndex;
+            makeOrderEditable(orderIndex);
+        });
+    });
+
+    saveButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const orderId = event.target.dataset.orderId;
+            const orderIndex = event.target.dataset.orderIndex;
+            saveOrderChanges(orderId, orderIndex);
+        });
+    });
+}
+
+function makeOrderEditable(orderIndex) {
+    const orderDiv = document.getElementById(`order-${orderIndex}`);
+    const editableFields = orderDiv.querySelectorAll('.editable');
+    editableFields.forEach(field => {
+        field.contentEditable = true;
+        field.style.backgroundColor = '#f0f0f0';
+    });
+    orderDiv.querySelector('.edit-order-btn').style.display = 'none';
+    orderDiv.querySelector('.save-order-btn').style.display = 'inline';
+}
+
+async function saveOrderChanges(orderId, orderIndex) {
+    const orderDiv = document.getElementById(`order-${orderIndex}`);
+    const editableFields = orderDiv.querySelectorAll('.editable');
+    const updatedOrder = {
+        user: {},
+        user_address: {},
+        status: false
+    };
+
+    editableFields.forEach(field => {
+        const fieldName = field.dataset.field;
+        const fieldValue = field.textContent;
+        if (['username', 'email'].includes(fieldName)) {
+            updatedOrder.user[fieldName] = fieldValue;
+        } else if (fieldName === 'status') {
+            updatedOrder.status = fieldValue === 'Delivered';
+        } else {
+            updatedOrder.user_address[fieldName] = fieldValue;
+        }
+        field.contentEditable = false;
+        field.style.backgroundColor = '';
+    });
+
+    try {
+        const response = await fetch(`/api/orders/${orderId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedOrder)
+        });
+
+        if (response.ok) {
+            alert('Order updated successfully!');
+            orderDiv.querySelector('.edit-order-btn').style.display = 'inline';
+            orderDiv.querySelector('.save-order-btn').style.display = 'none';
+        } else {
+            alert('Failed to update order.');
+        }
+    } catch (error) {
+        console.error('Error updating order:', error);
+        alert('An error occurred while updating the order.');
+    }
+}
 // load content on page
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Page fully loaded. Fetching users and creating buttons.');
