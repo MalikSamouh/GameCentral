@@ -299,18 +299,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         const userDiv = document.getElementById('adminUserList');
         userDiv.style.display = "block";
-        const allUsersBody = await fetch('api/users');
-        const allUsers = await allUsersBody.json();
-        allUsers.forEach(user => {
-            if (!user.isAdmin) {
-                const userInfo = document.createElement('div');
-                userInfo.innerHTML = `
-                <strong>Username:<strong> ${user.username}<br>
-                <strong>Email:<strong> ${user.email}<br>
-                <hr>`;
-                userDiv.append(userInfo);
-            }
-        });
     }
     await displayOrderDetails(userLoggedIn);
 });
