@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Home Page</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <script src="js/userHomePage.js"></script>
+    <script src="js/userHomePage.js" ></script>
 </head>
 
 <body>
@@ -129,7 +129,7 @@
             </div>
         </div>
 
-
+        <br>
         <button id="adminStockButton" class="adminStockButton">Restock Items</button>
 
         <!-- admin block -->
@@ -147,6 +147,7 @@
             </h2>
             <div id="adminUserListDiv" class="adminUserListDiv"></div>
         </div>
+        
 
         <h1>Order List
             <hr>
@@ -156,6 +157,43 @@
             </div>
         </div>
     </div>
+
+    <div id="editUserModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close edit-user-close">&times;</span>
+            <h2>Edit User Information</h2>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId" name="userId" value="">
+                <label for="editUserUsername">Username:</label>
+                <input type="text" id="editUserUsername" name="username" value="">
+                <label for="editUserEmail">Email:</label>
+                <input type="email" id="editUserEmail" name="email" value="">
+                <button id="saveEditButton" type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+    
+
+    <button id="adminEditButton" class="adminEditButton">Edit Users Information</button>
+    <br>
+
+<!-- admin block for editing user information -->
+<div id="adminEditModal" class="adminEditModal" style="display: none;">
+    <div class="modal-content" id="admin-edit-modal-content">
+        <span class="adminEditClose">&times;</span>
+        <form id="admin-edit-form">
+        </form>
+    </div>
+</div>
+
+<div id="adminUserList" class="adminUserList">
+    <h2>Registered Users</h2>
+    <hr>
+    <div id="adminUserListDiv" class="adminUserListDiv">
+    </div>
+</div>
+
+    
 
     <script>
         document.addEventListener('DOMContentLoaded', updateUserStatus);

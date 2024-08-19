@@ -1,7 +1,20 @@
+let isUpdating = false;
+
 async function updateUserStatus() {
+    if (isUpdating) {
+        console.log('Skipping updateUserStatus as it is already running');
+        return;
+    }
+    console.log('updateUserStatus function is running');
+    isUpdating = true;
+
     try {
         const response = await fetch('/api/checkLogin');
         const data = await response.json();
+
+        console.log('checkLogin response received:', response);
+
+        console.log('checkLogin data:', data);
 
         const userStatusDiv = document.getElementById('login-block');
 
@@ -47,6 +60,14 @@ async function updateUserStatus() {
                     }
                 });
             }
+            if (data.isAdmin || data.email === 'admin@gmail.com') { //added when admin can only edit users info
+                document.getElementById('adminEditButton').style.display = 'block';
+                document.getElementById('adminStockButton').style.display = 'block';
+            } else {
+                document.getElementById('adminEditButton').style.display = 'none';
+                document.getElementById('adminStockButton').style.display = 'none';
+            }
+            
 
         } else {
             userStatusDiv.innerHTML = `
@@ -60,7 +81,11 @@ async function updateUserStatus() {
     } catch (error) {
         console.error('Error fetching login status:', error);
     }
+    finally {
+        isUpdating = false;
+    }
 }
+document.addEventListener('DOMContentLoaded', updateUserStatus);
 
 async function isUserLoggedIn() {
     try {
@@ -118,6 +143,7 @@ async function displayOrderDetails(loggedUser) {
             innerHTML += `<li>${item.product[0].product_name} x ${item.quantity} = ${(item.quantity * item.product[0].price).toFixed(2)}</li>`;
         });
         innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price}<br><hr>`
+
         orderContainer.innerHTML = innerHTML;
         ordersContainer.appendChild(orderContainer);
     });
@@ -125,9 +151,16 @@ async function displayOrderDetails(loggedUser) {
 }
 
 // load content on page
-
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Page fully loaded. Fetching users and creating buttons.');
+    await fetchUsersAndCreateButtons();
+    console.log('Buttons created. Now attaching event listeners.');
+
+      const editButton = document.querySelector('.edit-user-button');
     updateUserStatus();
+
+    attachEditButtonListeners();
+
     const userLoggedIn = await isUserLoggedIn();
     if (!userLoggedIn.isLoggedIn) {
         window.location.href = '/signinPage';
@@ -156,7 +189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('editCardNumber').value = userLoggedIn.user.cardNumber;
         document.getElementById('editCvv').value = userLoggedIn.user.cvv;
         document.getElementById('editExpiryDate').value = userLoggedIn.user.expiryDate;
-        
+        updateUserUI(userLoggedIn); // Function to update user info in the DOM
+
+        await displayOrderDetails(userLoggedIn);
 
     }
     const editUsernameButton = document.getElementById('editUsernameButton'); //editing the user and email
@@ -165,16 +200,230 @@ document.addEventListener('DOMContentLoaded', async () => {
     editUsernameButton.addEventListener('click', () => {
         editFormContainer.style.display = 'block';
         document.getElementById('editUsername').focus();
+        handleProfileEditButton(); // Function to handle profile edit actions
+
     });
     const span = document.getElementsByClassName("editClose")[0];
     span.onclick = function () {
         editFormContainer.style.display = "none";
     }
+    window.editUser = function(userId) {
+        console.log('Editing user:', userId); // Debugging line
+    //    // fetch(`/api/users/${userId}`)
+    //         .then(response => response.json())
+    //         .then(user => {
+    //             // Populate the modal with the user data
+    //             document.getElementById('editUserId').value = user._id;
+    //             document.getElementById('editUserUsername').value = user.username;
+    //             document.getElementById('editUserEmail').value = user.email;
+    
+    //             // Display the modal
+    //             const editUserModal = document.getElementById('editUserModal');
+    //             editUserModal.style.display = 'block';
+    // //         })
+    //         .catch(error => console.error('Error fetching user:', error));
+
+    document.getElementById('editUserId').value = user._id;
+    document.getElementById('editUserUsername').value = user.username;
+                document.getElementById('editUserEmail').value = user.email;
+
+
+ };
+ document.getElementById('adminEditButton').addEventListener('click', () => {
+    document.getElementById('adminEditModal').style.display = 'block';
+
+    fetch('/api/users')
+        .then(response => response.json())
+        .then(users => {
+            const modalBody = document.getElementById('admin-edit-form');
+            modalBody.innerHTML = ''; // Clear previous content
+
+            users.forEach(user => {
+                const userContainer = document.createElement('div');
+                userContainer.classList.add('user-container');
+
+                // User information fields
+                const fields = [
+                    { label: 'Username', value: user.username, id: `username${user._id}` },
+                    { label: 'Address', value: user.billingAddress, id: `address${user._id}` },
+                    { label: 'City', value: user.city, id: `city${user._id}` },
+                    { label: 'State', value: user.state, id: `state${user._id}` },
+                    { label: 'Country', value: user.country, id: `country${user._id}` },
+                    { label: 'Postal Code', value: user.postalCode, id: `postalCode${user._id}` },
+                    { label: 'Name on Card', value: user.nameOnCard, id: `nameOnCard${user._id}` },
+                    { label: 'Card Number', value: user.cardNumber, id: `cardNumber${user._id}` },
+                    { label: 'CVV', value: user.cvv, id: `cvv${user._id}` },
+                    { label: 'Expiry Date', value: user.expiryDate, id: `expiryDate${user._id}` }
+                ];
+
+                fields.forEach(field => {
+                    const label = document.createElement('label');
+                    label.setAttribute('for', field.id);
+                    label.textContent = `${field.label}: `;
+                    
+                    const input = document.createElement('input');
+                    input.setAttribute('type', 'text');
+                    input.setAttribute('id', field.id);
+                    input.setAttribute('name', field.label.toLowerCase().replace(/\s/g, ''));
+                    input.setAttribute('value', field.value);
+
+                    userContainer.appendChild(label);
+                    userContainer.appendChild(input);
+                    userContainer.appendChild(document.createElement('br'));
+                });
+
+                // Edit button
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.className = 'edit-user-button';
+                editButton.setAttribute('data-user-id', user._id);
+                editButton.addEventListener('click', function() {
+                    const isEditing = this.textContent === 'Save Changes';
+                    const userId = this.getAttribute('data-user-id');
+                    
+                    console.log('Button clicked. Current mode:', isEditing ? 'Save Changes' : 'Edit');
+                    console.log('User ID:', userId);
+                
+                    if (isEditing) {
+                        console.log('Saving changes for user:', userId);
+                        // Save the changes
+                        saveUserChanges(userId).then(() => {
+                            this.textContent = 'Edit';
+                            toggleFieldsEditable(false, userId);  // Disable fields after saving
+                            console.log('Changes saved, fields disabled.');
+                        }).catch(error => {
+                            console.error('Error saving changes:', error);
+                        });
+                    } else {
+                        console.log('Enabling fields for editing');
+                        // Enable editing
+                        toggleFieldsEditable(true, userId);
+                        this.textContent = 'Save Changes';
+                        console.log('Fields enabled, text changed to Save Changes.');
+                    }
+                });
+                
+                function toggleFieldsEditable(editable, userId) {
+                    const fields = document.querySelectorAll(`#username${userId}, #address${userId}, #city${userId}, #state${userId}, #country${userId}, #postalCode${userId}, #nameOnCard${userId}, #cardNumber${userId}, #cvv${userId}, #expiryDate${userId}`);
+                    fields.forEach(field => {
+                        field.disabled = !editable;
+                    });
+                }
+                function handleModalClose(modalElement) {
+                    modalElement.style.display = 'none';
+                }
+                document.querySelectorAll('.modal-close').forEach(closeButton => {
+                    closeButton.addEventListener('click', function() {
+                        handleModalClose(closeButton.closest('.modal'));
+                    });
+                });
+                // Append user container and edit button
+                userContainer.appendChild(editButton);
+                modalBody.appendChild(userContainer);
+                modalBody.appendChild(document.createElement('hr'));
+            });
+
+            // Event listeners for each edit button
+            document.querySelectorAll('.edit-user-button').forEach(button => {
+                button.addEventListener('click', event => {
+                    console.log('Edit button clicked');
+        const userId = event.target.getAttribute('data-user-id');
+        console.log('Editing user with ID:', userId);
+        editUser(userId);
+                });
+            });
+
+            // Show the modal
+            const editModal = document.getElementById('adminEditModal');
+            editModal.style.display = 'block';
+        })
+        .catch(error => console.error('Error fetching users:', error));
+});
+
+
+
+async function saveUserChanges(userId) {
+    console.log("saveUserChanges function called for user ID:", userId);
+
+    const updatedUser = {
+        username: document.getElementById(`username${userId}`).value,
+        billingAddress: document.getElementById(`address${userId}`).value,
+        city: document.getElementById(`city${userId}`).value,
+        state: document.getElementById(`state${userId}`).value,
+        country: document.getElementById(`country${userId}`).value,
+        postalCode: document.getElementById(`postalCode${userId}`).value,
+        nameOnCard: document.getElementById(`nameOnCard${userId}`).value,
+        cardNumber: document.getElementById(`cardNumber${userId}`).value,
+        cvv: document.getElementById(`cvv${userId}`).value,
+        expiryDate: document.getElementById(`expiryDate${userId}`).value
+    };
+
+    console.log("Updated user data being sent:", updatedUser);
+
+    try {
+        const response = await fetch(`/api/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedUser)
+        });
+
+        if (response.ok) {
+            console.log('User information updated successfully!');
+            alert('User information updated successfully!');
+            window.location.reload(); // Reload the page to reflect the changes
+        } else {
+            const errorData = await response.json();
+            console.error('Failed to update user information:', errorData);
+            alert('Failed to update user information.');
+        }
+    } catch (error) {
+        console.error('Error updating user:', error);
+        alert('An error occurred while updating user information.');
+    }
+}
+
+
+// Close the modal when the 'x' is clicked
+const closeEditModalSpan = document.getElementsByClassName("adminEditClose")[0];
+closeEditModalSpan.onclick = function () {
+    document.getElementById('adminEditModal').style.display = "none";
+}
+
+// Close the modal when clicking outside of it
+window.onclick = function (event) {
+    const editModal = document.getElementById('adminEditModal');
+    if (event.target == editModal) {
+        editModal.style.display = "none";
+    }
+}
+
+    
+    console.log('Attaching event listeners to edit buttons');
+
+    const editButtons = document.querySelectorAll('.edit-user-button');
+    
+    editButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log('Edit button clicked');
+            alert('Edit button clicked');  // Just for testing
+            const userId = event.target.getAttribute('data-user-id');
+            console.log('Editing user with ID:', userId);
+            editUser(userId);
+        });
+    });
+    
+    
     window.onclick = function (event) {
-        if (event.target == editFormContainer) {
-            editFormContainer.style.display = "none";
+        const editUserModal = document.getElementById('editUserModal');
+        if (event.target == editUserModal) {
+            editUserModal.style.display = 'none';
         }
     }
+    
+    
+    
 
     const profileForm = document.getElementById('editProfileForm');
     profileForm.addEventListener('submit', async function (event) {
@@ -286,18 +535,145 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         const userDiv = document.getElementById('adminUserList');
         userDiv.style.display = "block";
-        const allUsersBody = await fetch('api/users');
+        const allUsersBody = await fetch('/api/users');
         const allUsers = await allUsersBody.json();
         allUsers.forEach(user => {
             if (!user.isAdmin) {
                 const userInfo = document.createElement('div');
                 userInfo.innerHTML = `
-                <strong>Username:<strong> ${user.username}<br>
-                <strong>Email:<strong> ${user.email}<br>
-                <hr>`;
+                    <strong>Username:</strong> ${user.username}<br>
+                    <strong>Email:</strong> ${user.email}<br>
+                    <hr>`;
                 userDiv.append(userInfo);
             }
         });
+        
+        
+        
     }
+    document.getElementById('editUserForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        
+        const userId = document.getElementById('editUserId').value;
+        const updatedUsername = document.getElementById('editUserUsername').value;
+        const updatedEmail = document.getElementById('editUserEmail').value;
+        
+        try {
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: updatedUsername,
+                    email: updatedEmail,
+                })
+            });
+    
+            if (response.ok) {
+                alert('User information updated successfully!');
+                document.getElementById('editUserModal').style.display = 'none';
+                window.location.reload();  // Reload the page to reflect the changes
+            } else {
+                alert('Failed to update user information.');
+            }
+        } catch (error) {
+            console.error('Error updating user:', error);
+        }
+    });
+    
+    await fetchUsersAndCreateButtons();
+
+
+    attachEditButtonListeners();
+
     await displayOrderDetails(userLoggedIn);
 });
+//from here
+async function fetchUsersAndCreateButtons() {
+    try {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+        const modalBody = document.getElementById('admin-edit-form');
+
+        users.forEach(user => {
+            const userContainer = document.createElement('div');
+            userContainer.classList.add('user-container');
+
+            // Creating an edit button for each user
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.className = 'edit-user-button';
+            editButton.setAttribute('data-user-id', user._id);
+
+            userContainer.appendChild(editButton);
+            modalBody.appendChild(userContainer);
+        });
+
+        console.log('Buttons created.');
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+}
+
+function attachEditButtonListeners() {
+    console.log('Attaching event listeners to edit buttons');
+    const editButtons = document.querySelectorAll('.edit-user-button');
+
+    if (editButtons.length === 0) {
+        console.error('No edit buttons found!');
+        return;
+    }
+
+    editButtons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            console.log('Edit button clicked');
+            alert('Edit button clicked'); // Testing feedback
+            const userId = event.target.getAttribute('data-user-id');
+            console.log('Editing user with ID:', userId);
+            editUser(userId);
+        });
+    });
+}
+
+function handleProfileEditButton() {
+    const editUsernameButton = document.getElementById('editUsernameButton');
+    const editFormContainer = document.getElementById('editFormModal');
+
+    editUsernameButton.addEventListener('click', () => {
+        editFormContainer.style.display = 'block';
+        document.getElementById('editUsername').focus();
+    });
+
+    const span = document.getElementsByClassName("editClose")[0];
+    span.onclick = function () {
+        editFormContainer.style.display = "none";
+    }
+}
+
+function updateUserUI(userLoggedIn) {
+    document.getElementById('username').innerHTML = userLoggedIn.username;
+    document.getElementById('email').innerHTML = userLoggedIn.email;
+    document.getElementById('address').innerHTML = userLoggedIn.user.billingAddress;
+    document.getElementById('city').innerHTML = userLoggedIn.user.city;
+    document.getElementById('state').innerHTML = userLoggedIn.user.state;
+    document.getElementById('country').innerHTML = userLoggedIn.user.country;
+    document.getElementById('postalCode').innerHTML = userLoggedIn.user.postalCode;
+    document.getElementById('nameOnCard').innerHTML = userLoggedIn.user.nameOnCard;
+    document.getElementById('cardNumber').innerHTML = userLoggedIn.user.cardNumber;
+    document.getElementById('cvv').innerHTML = userLoggedIn.user.cvv;
+    document.getElementById('expiryDate').innerHTML = userLoggedIn.user.expiryDate;
+
+    // Pre-fill form fields with user data
+    document.getElementById('editUsername').value = userLoggedIn.username;
+    document.getElementById('editEmail').value = userLoggedIn.email;
+    document.getElementById('editAddress').value = userLoggedIn.user.billingAddress;
+    document.getElementById('editCity').value = userLoggedIn.user.city;
+    document.getElementById('editState').value = userLoggedIn.user.state;
+    document.getElementById('editCountry').value = userLoggedIn.user.country;
+    document.getElementById('editPostalCode').value = userLoggedIn.user.postalCode;
+    document.getElementById('editNameOnCard').value = userLoggedIn.user.nameOnCard;
+    document.getElementById('editCardNumber').value = userLoggedIn.user.cardNumber;
+    document.getElementById('editCvv').value = userLoggedIn.user.cvv;
+    document.getElementById('editExpiryDate').value = userLoggedIn.user.expiryDate;
+}

@@ -19,6 +19,8 @@ router.post('/updateProfile', userController.updateProfile);
 router.get('/product', productController.getProducts);
 router.put('/product', productController.updateStock);
 router.post('/product', productController.removeProductsFromStock);
+router.put('/users/:userId', userController.updateUserById);
+
 
 // Cart routes
 router.post('/cart/add', cartController.addToCart);
@@ -29,5 +31,6 @@ router.get('/cart', cartController.getCart);
 router.post('/orders', orderController.putOrder);
 router.get('/orders', orderController.getAllOrders);
 router.get('/orders/:id', orderController.getOrdersByUserId);
+
 
 module.exports = router;
