@@ -47,6 +47,14 @@ async function updateUserStatus() {
                     }
                 });
             }
+            if (data.isAdmin || data.email === 'admin@gmail.com') { //added when admin can only edit users info
+                document.getElementById('adminEditButton').style.display = 'block';
+                document.getElementById('adminStockButton').style.display = 'block';
+            } else {
+                document.getElementById('adminEditButton').style.display = 'none';
+                document.getElementById('adminStockButton').style.display = 'none';
+            }
+            
 
         } else {
             userStatusDiv.innerHTML = `
@@ -172,21 +180,237 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     window.editUser = function(userId) {
         console.log('Editing user:', userId); // Debugging line
-        fetch(`/api/users/${userId}`)
-            .then(response => response.json())
-            .then(user => {
-                // Populate the modal with the user data
-                document.getElementById('editUserId').value = user._id;
-                document.getElementById('editUserUsername').value = user.username;
+    //    // fetch(`/api/users/${userId}`)
+    //         .then(response => response.json())
+    //         .then(user => {
+    //             // Populate the modal with the user data
+    //             document.getElementById('editUserId').value = user._id;
+    //             document.getElementById('editUserUsername').value = user.username;
+    //             document.getElementById('editUserEmail').value = user.email;
+    
+    //             // Display the modal
+    //             const editUserModal = document.getElementById('editUserModal');
+    //             editUserModal.style.display = 'block';
+    // //         })
+    //         .catch(error => console.error('Error fetching user:', error));
+
+    document.getElementById('editUserId').value = user._id;
+    document.getElementById('editUserUsername').value = user.username;
                 document.getElementById('editUserEmail').value = user.email;
-    
-                // Display the modal
-                const editUserModal = document.getElementById('editUserModal');
-                editUserModal.style.display = 'block';
-            })
-            .catch(error => console.error('Error fetching user:', error));
-    };
-    
+
+
+ };
+ document.getElementById('adminEditButton').addEventListener('click', () => {
+    fetch('/api/users')
+        .then(response => response.json())
+        .then(users => {
+            const modalBody = document.getElementById('admin-edit-form');
+            modalBody.innerHTML = ''; // Clear previous content
+
+            users.forEach(user => {
+                // Username label and input
+                const userLabel = document.createElement('label');
+                userLabel.setAttribute('for', `username${user._id}`);
+                userLabel.textContent = `Username: `;
+                
+                const userInput = document.createElement('input');
+                userInput.setAttribute('type', 'text');
+                userInput.setAttribute('id', `username${user._id}`);
+                userInput.setAttribute('name', `username`);
+                userInput.setAttribute('value', user.username);
+                
+                // Address label and input
+                const addressLabel = document.createElement('label');
+                addressLabel.setAttribute('for', `address${user._id}`);
+                addressLabel.textContent = `Address: `;
+                
+                const addressInput = document.createElement('input');
+                addressInput.setAttribute('type', 'text');
+                addressInput.setAttribute('id', `address${user._id}`);
+                addressInput.setAttribute('name', `address`);
+                addressInput.setAttribute('value', user.billingAddress);
+                
+                // City label and input
+                const cityLabel = document.createElement('label');
+                cityLabel.setAttribute('for', `city${user._id}`);
+                cityLabel.textContent = `City: `;
+                
+                const cityInput = document.createElement('input');
+                cityInput.setAttribute('type', 'text');
+                cityInput.setAttribute('id', `city${user._id}`);
+                cityInput.setAttribute('name', `city`);
+                cityInput.setAttribute('value', user.city);
+                
+                // State label and input
+                const stateLabel = document.createElement('label');
+                stateLabel.setAttribute('for', `state${user._id}`);
+                stateLabel.textContent = `State: `;
+                
+                const stateInput = document.createElement('input');
+                stateInput.setAttribute('type', 'text');
+                stateInput.setAttribute('id', `state${user._id}`);
+                stateInput.setAttribute('name', `state`);
+                stateInput.setAttribute('value', user.state);
+                
+                // Country label and input
+                const countryLabel = document.createElement('label');
+                countryLabel.setAttribute('for', `country${user._id}`);
+                countryLabel.textContent = `Country: `;
+                
+                const countryInput = document.createElement('input');
+                countryInput.setAttribute('type', 'text');
+                countryInput.setAttribute('id', `country${user._id}`);
+                countryInput.setAttribute('name', `country`);
+                countryInput.setAttribute('value', user.country);
+                
+                // Postal Code label and input
+                const postalCodeLabel = document.createElement('label');
+                postalCodeLabel.setAttribute('for', `postalCode${user._id}`);
+                postalCodeLabel.textContent = `Postal Code: `;
+                
+                const postalCodeInput = document.createElement('input');
+                postalCodeInput.setAttribute('type', 'text');
+                postalCodeInput.setAttribute('id', `postalCode${user._id}`);
+                postalCodeInput.setAttribute('name', `postalCode`);
+                postalCodeInput.setAttribute('value', user.postalCode);
+                
+                // Card Information
+                const nameOnCardLabel = document.createElement('label');
+                nameOnCardLabel.setAttribute('for', `nameOnCard${user._id}`);
+                nameOnCardLabel.textContent = `Name on Card: `;
+                
+                const nameOnCardInput = document.createElement('input');
+                nameOnCardInput.setAttribute('type', 'text');
+                nameOnCardInput.setAttribute('id', `nameOnCard${user._id}`);
+                nameOnCardInput.setAttribute('name', `nameOnCard`);
+                nameOnCardInput.setAttribute('value', user.nameOnCard);
+                
+                const cardNumberLabel = document.createElement('label');
+                cardNumberLabel.setAttribute('for', `cardNumber${user._id}`);
+                cardNumberLabel.textContent = `Card Number: `;
+                
+                const cardNumberInput = document.createElement('input');
+                cardNumberInput.setAttribute('type', 'text');
+                cardNumberInput.setAttribute('id', `cardNumber${user._id}`);
+                cardNumberInput.setAttribute('name', `cardNumber`);
+                cardNumberInput.setAttribute('value', user.cardNumber);
+                cardNumberInput.setAttribute('inputmode', 'numeric');
+                cardNumberInput.setAttribute('pattern', '[0-9\\s]{13,19}');
+                cardNumberInput.setAttribute('maxlength', '19');
+                
+                const cvvLabel = document.createElement('label');
+                cvvLabel.setAttribute('for', `cvv${user._id}`);
+                cvvLabel.textContent = `CVV: `;
+                
+                const cvvInput = document.createElement('input');
+                cvvInput.setAttribute('type', 'text');
+                cvvInput.setAttribute('id', `cvv${user._id}`);
+                cvvInput.setAttribute('name', `cvv`);
+                cvvInput.setAttribute('value', user.cvv);
+                cvvInput.setAttribute('inputmode', 'numeric');
+                cvvInput.setAttribute('pattern', '[0-9]{3}');
+                cvvInput.setAttribute('maxlength', '3');
+                
+                const expiryDateLabel = document.createElement('label');
+                expiryDateLabel.setAttribute('for', `expiryDate${user._id}`);
+                expiryDateLabel.textContent = `Expiry Date: `;
+                
+                const expiryDateInput = document.createElement('input');
+                expiryDateInput.setAttribute('type', 'text');
+                expiryDateInput.setAttribute('id', `expiryDate${user._id}`);
+                expiryDateInput.setAttribute('name', `expiryDate`);
+                expiryDateInput.setAttribute('value', user.expiryDate);
+                
+                // Append to modal body
+                modalBody.appendChild(userLabel);
+                modalBody.appendChild(userInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(addressLabel);
+                modalBody.appendChild(addressInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(cityLabel);
+                modalBody.appendChild(cityInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(stateLabel);
+                modalBody.appendChild(stateInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(countryLabel);
+                modalBody.appendChild(countryInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(postalCodeLabel);
+                modalBody.appendChild(postalCodeInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(nameOnCardLabel);
+                modalBody.appendChild(nameOnCardInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(cardNumberLabel);
+                modalBody.appendChild(cardNumberInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(cvvLabel);
+                modalBody.appendChild(cvvInput);
+                modalBody.appendChild(document.createElement('br'));
+                modalBody.appendChild(expiryDateLabel);
+                modalBody.appendChild(expiryDateInput);
+                modalBody.appendChild(document.createElement('br'));
+            });
+
+            // Save Changes button
+            const saveButton = document.createElement('button');
+            saveButton.setAttribute('type', 'submit');
+            saveButton.textContent = 'Save Changes';
+            saveButton.className = 'edit-button';
+            saveButton.id = 'saveEditButton';
+            modalBody.appendChild(saveButton);
+
+            // Event listener for submitting the form
+            document.getElementById('admin-edit-form').addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                const formValues = Object.fromEntries(formData.entries());
+                const values = {
+                    values: Object.entries(formValues).map(([key, value]) => ({
+                        user_id: key,
+                        updated_value: value,
+                    }))
+                };
+                const updateUser = await fetch('/api/users', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(values),
+                });
+                if (updateUser.ok) {
+                    window.alert('User information updated successfully');
+                    window.location.href = '/profile';
+                } else {
+                    window.alert(`Update Failed: ${updateUser.error}`);
+                }
+            });
+
+            // Show the modal
+            const editModal = document.getElementById('adminEditModal');
+            editModal.style.display = 'block';
+        })
+        .catch(error => console.error('Error fetching users:', error));
+});
+
+// Close the modal when the 'x' is clicked
+const closeEditModalSpan = document.getElementsByClassName("adminEditClose")[0];
+closeEditModalSpan.onclick = function () {
+    document.getElementById('adminEditModal').style.display = "none";
+}
+
+// Close the modal when clicking outside of it
+window.onclick = function (event) {
+    const editModal = document.getElementById('adminEditModal');
+    if (event.target == editModal) {
+        editModal.style.display = "none";
+    }
+}
+
+
+
     
        
     
@@ -332,7 +556,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 userInfo.innerHTML = `
                     <strong>Username:</strong> ${user.username}<br>
                     <strong>Email:</strong> ${user.email}<br>
-                    <button class="edit-user-button" data-user-id="${user._id}" onclick="editUser('${user._id}')">Edit</button>
                     <hr>`;
                 userDiv.append(userInfo);
             }
