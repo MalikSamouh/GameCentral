@@ -93,11 +93,23 @@ async function addOrder(orders) {
     await fetch('/orders', options);
 }
 
-async function displayOrderDetails(loggedUser) {
+function searchOrdersByUsername(orderList) {
+    const searchInput = document.getElementById('searchInputOrders').value.toLowerCase();
+
+    const filteredOrders = orderList.filter(order => 
+        order.user.username.toLowerCase().includes(searchInput) || 
+        order.user.email.toLowerCase().includes(searchInput)
+    );
+
+    const ordersDiv = document.getElementById("orders-container");
+    ordersDiv.innerHTML = '';
+    displayOrderDetails(filteredOrders);
+}
+
+
+async function displayOrderDetails(orders) {
     const detailsDiv = document.getElementById('orders-container');
     const ordersContainer = document.createElement('div');
-    const ordersFetch = await getOrders(loggedUser);
-    const orders = await ordersFetch.json();
     if (orders.length === 0) {
         ordersContainer.innerHTML = `<strong> You do not have orders. <a href="/shoppingPage">Make one.</a></strong>`;
     }
@@ -163,13 +175,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Set up search button event listener
         const searchButton = document.getElementById('searchButton');
         searchButton.addEventListener('click', () => performUserSearch(users));
-
-        // Optionally, allow pressing 'Enter' to trigger search
-        // document.getElementById('searchInput').addEventListener('keyup', (event) => {
-        //     if (event.key === 'Enter') {
-        //         performUserSearch(users);
-        //     }
-        // });
     }
 
     const editUsernameButton = document.getElementById('editUsernameButton'); //editing the user and email
@@ -300,7 +305,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const userDiv = document.getElementById('adminUserList');
         userDiv.style.display = "block";
     }
-    await displayOrderDetails(userLoggedIn);
+
+    const ordersFetch = await getOrders(userLoggedIn);
+    const orders = await ordersFetch.json();
+    const searchButton = document.getElementById('searchButtonOrders');
+    searchButton.addEventListener('click', () => searchOrdersByUsername(orders));
+
+    await displayOrderDetails(orders);
 });
 async function getUserList() {
     try {
@@ -313,7 +324,7 @@ async function getUserList() {
 }
 function loadUsersContainer(users) {
     const userListDiv = document.getElementById('userList');
-    userListDiv.innerHTML = ''; // Clear existing users
+    userListDiv.innerHTML = '';
 
     users.forEach(user => {
         const userDiv = document.createElement('div');
@@ -329,16 +340,14 @@ function loadUsersContainer(users) {
 function performUserSearch(usersList) {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
 
-    // Filter the users based on the search input
     const filteredUsers = usersList.filter(user => 
         user.username.toLowerCase().includes(searchInput) || 
         user.email.toLowerCase().includes(searchInput)
     );
 
-    // Clear the existing user list before appending the filtered users
     const userListDiv = document.getElementById('userList');
     userListDiv.innerHTML = ''; 
 
-   loadUsersContainer(filteredUsers); // Reload the filtered users
+   loadUsersContainer(filteredUsers);
 }
 
