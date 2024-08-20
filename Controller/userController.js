@@ -22,7 +22,6 @@ exports.registerUser = async (req, res) => {
     const saltRounds = 10;
 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    consol.log(admin)
 
     const newUser = new User({
       username,
@@ -138,18 +137,26 @@ exports.getAllUsers = async (req, res) => {
 
 
 exports.updateProfile = async (req, res) => {
-  const { username, email, address, city, state, country, postalCode, cardNumber, nameOnCard, cvv, expiryDate } = req.body;
+  const { userId, username, email, address, city, state, country, postalCode, cardNumber, nameOnCard, cvv, expiryDate } = req.body;
 
   try {
-    const userId = req.session.userId;
-    if (!userId) {
-      return res.status(401).json({ message: 'Not authenticated' });
-    }
+    const currentUserName = req.session.username;
+    const updateFields = {};
 
-    await User.findByIdAndUpdate(userId, { username, email, billingAddress: address, city, postalCode, state, country, cardNumber, nameOnCard, cvv, expiryDate });
+    updateFields.username = username;
+    updateFields.email = email;
+    updateFields.billingAddress = address;
+    updateFields.city = city;
+    updateFields.state = state;
+    updateFields.country = country;
+    updateFields.postalCode = postalCode;
+    updateFields.cardNumber = cardNumber;
+    updateFields.nameOnCard = nameOnCard;
+    updateFields.cvv = cvv;
+    updateFields.expiryDate = expiryDate;
 
-    req.session.username = username;
-    req.session.email = email;
+    // Update the user's profile
+    await User.findOneAndUpdate({username: currentUserName}, {$set: updateFields});
 
     res.status(200).json({ message: 'Profile updated successfully' });
   } catch (error) {
@@ -157,4 +164,39 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Failed to update profile' });
   }
 };
+// Controller/userController.js
 
+//const User = require('../Model/userModel');
+
+exports.updateUserById = async (req, res) => {
+    const userId = req.params.userId;
+    const updatedUserData = req.body;
+    console.log('Update Request for User ID:', userId);
+    console.log('Updated Data:', updatedUserData);
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        // Update user fields
+        user.username = updatedUserData.username || user.username;
+        user.billingAddress = updatedUserData.billingAddress || user.billingAddress;
+        user.city = updatedUserData.city || user.city;
+        user.state = updatedUserData.state || user.state;
+        user.country = updatedUserData.country || user.country;
+        user.postalCode = updatedUserData.postalCode || user.postalCode;
+        user.nameOnCard = updatedUserData.nameOnCard || user.nameOnCard;
+        user.cardNumber = updatedUserData.cardNumber || user.cardNumber;
+        user.cvv = updatedUserData.cvv || user.cvv;
+        user.expiryDate = updatedUserData.expiryDate || user.expiryDate;
+
+        await user.save();
+        console.log('User updated successfully');
+
+        res.status(200).send({ message: 'User updated successfully' });
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).send({ message: 'Failed to update user information' });
+    }
+};

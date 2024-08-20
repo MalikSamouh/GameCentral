@@ -6,11 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="js/shoppingPage.js"></script>
 </head>
 
 <body>
   <header>
+    <!-- <div style="text-align: center;">
+      <p>🎉 Summer Sale! Get special <span style="font-weight: bold;">deals</span> on select titles!</p>
+  </div> -->
+  
     <a href="/">
       <div class="logo">
         <img src="/images/gameStore.png" alt="Logo">
@@ -24,19 +29,57 @@
         <img src="/images/FlagofCanada.png" alt="Canadian Flag">
         <span>CAD</span>
       </div>
-
     </div>
   </header>
-    <div class="container">
-        <h1>Welcome to GameCentral!</h1>
-        <a href="shoppingPage">
-            <div class="shoppingButton">
-                <div>Shop</div>
-            </div>
+ 
+  <div class="container">
+      <h1>Welcome to GameCentral!</h1>
+      <a href="shoppingPage">
+          <div class="shoppingButton">
+              <div>Shop</div>
+          </div>
+      </a>
+   
+      <!-- Game Carousel -->
+      <div class="game-carousel-container">
+          <h2>Featured Games</h2>
+          <div class="game-carousel">
+              <!-- Dynamic content will be injected here -->
+          </div>
+      </div>
+
+      <!-- About Us Information -->
+      <div class="about-us-info">
+          <h2>About Us</h2>
+          <p>We are GameCentral, your place to find the best indie games and fan favorites. We offer a wide range of games across different platforms, so there's something for everyone. Whether you're looking for a new game to try or a classic you love, we've got you covered.</p>
+      </div>
+
+      <!-- Social Media Icons -->
+      <div class="social-media-icons">
+        <a href="https://www.instagram.com" target="_blank" class="social-icon">
+            <i class="fab fa-instagram"></i>
         </a>
-    </div>
+        <a href="https://www.facebook.com" target="_blank" class="social-icon">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://twitter.com" target="_blank" class="social-icon">
+            <i class="fab fa-twitter"></i>
+        </a>
+      </div>
+  </div>
+
   <script>
-    document.addEventListener('DOMContentLoaded', updateUserStatus);
+    // The script provided above to load featured games dynamically
+    document.addEventListener('DOMContentLoaded', async () => {
+        await updateUserStatus();
+        await loadCart();
+
+        // Fetch the game list for the homepage
+        const gameList = await getGameList();
+        
+        // Populate the featured games on the homepage
+        populateFeaturedGames(gameList);
+    });
   </script>
 </body>
 
