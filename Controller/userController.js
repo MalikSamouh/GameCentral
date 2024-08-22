@@ -111,7 +111,7 @@ exports.logoutUser = async (req, res) => {
 exports.checkLogin = async (req, res) => {
   if (req.session.userId) {
     // (req.session);
-    const user = await User.findOne({ username: req.session.username });
+    const user = await User.findById(req.session.userId);
     res.json({ isLoggedIn: true, username: req.session.username, email: req.session.email, user: user });
   } else {
     res.json({ isLoggedIn: false });
@@ -206,7 +206,6 @@ exports.updateUserById = async (req, res) => {
         user.cvv = updatedUserData.cvv || user.cvv;
         user.expiryDate = updatedUserData.expiryDate || user.expiryDate;
 
-        await user.save();
         console.log('User updated successfully');
 
         res.status(200).send({ message: 'User updated successfully' });
