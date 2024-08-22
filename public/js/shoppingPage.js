@@ -71,9 +71,7 @@ async function isUserLoggedIn() {
     }
 }
 
-//initialize the cart array
 
-// test
 async function loadCart() {
     try {
         const response = await fetch('/api/cart');
@@ -82,6 +80,7 @@ async function loadCart() {
         if (window.location.pathname !== '/checkoutPage.html') {
             updateCartDisplay();
         }
+        updateCartCount(); 
     } catch (error) {
         console.error('Error loading cart:', error);
     }
@@ -105,6 +104,9 @@ async function addToCart(productName) {
             const data = await response.json();
             cart = data.cart;
             updateCartDisplay();
+
+            showPopup(`${productName} added to cart!`);
+            updateCartCount();
         } else {
             const error = await response.json();
             console.error('Error adding to cart:', error);
@@ -112,6 +114,45 @@ async function addToCart(productName) {
     } catch (error) {
         console.error('Error adding to cart:', error);
     }
+}
+
+function updateCartCount() {
+    const cartCount = document.getElementById('cartCount');
+    if (!cartCount) {
+        const cartButton = document.getElementById('cartButton');
+        const newCartCount = document.createElement('span');
+        newCartCount.id = 'cartCount';
+        newCartCount.style.backgroundColor = 'red';
+        newCartCount.style.color = 'white';
+        newCartCount.style.borderRadius = '50%';
+        newCartCount.style.padding = '2px 6px';
+        newCartCount.style.position = 'absolute';
+        newCartCount.style.top = '0';
+        newCartCount.style.right = '0';
+        cartButton.style.position = 'relative';
+        cartButton.appendChild(newCartCount);
+    }
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById('cartCount').textContent = totalItems;
+}
+
+function showPopup(message) {
+    const popup = document.createElement('div');
+    popup.textContent = message;
+    popup.style.position = 'fixed';
+    popup.style.top = '20px';
+    popup.style.right = '20px';
+    popup.style.backgroundColor = '#4CAF50';
+    popup.style.color = 'white';
+    popup.style.padding = '15px';
+    popup.style.borderRadius = '5px';
+    popup.style.zIndex = '1000';
+    document.body.appendChild(popup);
+
+    // Remove popup after 3 seconds
+    setTimeout(() => {
+        document.body.removeChild(popup);
+    }, 3000);
 }
 
 async function removeFromCart(productName) {
@@ -128,6 +169,8 @@ async function removeFromCart(productName) {
             const data = await response.json();
             cart = data.cart;
             updateCartDisplay();
+            updateCartCount();
+
         } else {
             const error = await response.json();
             console.error('Error removing from cart:', error);
@@ -159,6 +202,7 @@ function updateCartDisplay() {
 
     const cartImage = document.getElementById('shoppingCartIcon');
     cartImage.src = cart.length > 0 ? '/images/shoppingCartFull.png' : '/images/shoppingCartEmpty.png';
+    updateCartCount();
 }
 
 // GAME PAGE
