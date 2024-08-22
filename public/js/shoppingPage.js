@@ -1,61 +1,17 @@
-import { getCart, cartAdd, cartRemove, isUserLoggedIn, getGameList, getUserInfo, updateProfile, placeOrder, updateUserStatus } from './apiRequests.js';
+import {
+    getCart,
+    cartAdd,
+    cartRemove,
+    isUserLoggedIn,
+    getGameList,
+    getUserInfo,
+    updateProfile,
+    placeOrder,
+    updateUserStatus,
+} from './apiRequests.js';
+import { getFilter, sortBy, searchGamesByKeyWord } from './filters.js';
 
 let cart = [];
-
-// const User = require("../Model/userModel");
-
-function getFilter(productsList) {
-    const filters = [];
-    const allPublishers = [];
-    const allCategories = [];
-    productsList.forEach(product => {
-        if (!allPublishers.some(item => item.optionName === product.publisher)) {
-            allPublishers.push({ optionName: product.publisher });
-        }
-        if (!allCategories.some(item => item.optionName === product.category)) {
-            allCategories.push({ optionName: product.category });
-        }
-    });
-    filters.push(
-        {
-            filterName: 'Category',
-            filterOptions: allCategories,
-        },
-        {
-            filterName: 'Publisher',
-            filterOptions: allPublishers,
-        },
-        {
-            filterName: 'Name Sorting',
-            filterOptions: [
-                { optionName: 'Name (A-Z)', type: 'radio', name: 'sortBy' },
-                { optionName: 'Name (Z-A)', type: 'radio', name: 'sortBy' },
-            ]
-        },
-        {
-            filterName: 'Price Sorting',
-            filterOptions: [
-                { optionName: 'Price (ASC)', type: 'radio', name: 'sortBy' },
-                { optionName: 'Price (DESC)', type: 'radio', name: 'sortBy' },
-            ]
-        });
-    return filters;
-};
-
-function sortBy(array, criteria) {
-    if (criteria === 'Name (A-Z)') {
-        array.sort((a, b) => a.product_name.localeCompare(b.product_name));
-    } else if (criteria === 'Name (Z-A)') {
-        array.sort((a, b) => b.product_name.localeCompare(a.product_name));
-    } else if (criteria === 'Price (ASC)') {
-        array.sort((a, b) => a.price - b.price);
-    } else if (criteria === 'Price (DESC)') {
-        array.sort((a, b) => b.price - a.price);
-    }
-    return array;
-}
-
-//initialize the cart array
 
 async function loadCart() {
     try {
@@ -64,7 +20,7 @@ async function loadCart() {
         if (window.location.pathname !== '/checkoutPage.html') {
             updateCartDisplay();
         }
-        updateCartCount(); 
+        updateCartCount();
     } catch (error) {
         console.error('Error loading cart:', error);
     }
@@ -227,24 +183,26 @@ async function updateShoppingPage() {
     const cartButton = document.getElementById("cartButton");
     const cartSpan = document.getElementsByClassName("close")[0];
 
-    const userLoggerIn = await isUserLoggedIn();
+    const userLoggedIn = await isUserLoggedIn();
 
     cartButton.onclick = () => {
-        if (userLoggerIn) {
+        if (userLoggedIn) {
             cartModal.style.display = "block";
         } else {
             window.location.href = '/signinPage';
-            return;
         }
-    }
+    };
+
     cartSpan.onclick = () => {
         cartModal.style.display = "none";
-    }
+    };
+
     window.onclick = (event) => {
         if (event.target == cartModal) {
             cartModal.style.display = "none";
         }
-    }
+    };
+
     const checkoutButton = document.getElementById("checkoutButton");
     if (checkoutButton) {
         checkoutButton.onclick = () => {
@@ -259,7 +217,13 @@ async function updateShoppingPage() {
     title.textContent = 'Game Catalogue';
     title.className = 'homepageTitle';
     document.body.appendChild(title);
-    const searchContainer = document.createElement('div'); //create a search bar
+
+    let displayedGames = [...gameList];
+
+    // LOAD FILTERS
+    const filterContainer = document.createElement('div');
+    filterContainer.className = 'filters';
+    const searchContainer = document.createElement('div');
     searchContainer.className = 'searchContainer';
 
     const searchInput = document.createElement('input');
@@ -270,31 +234,28 @@ async function updateShoppingPage() {
     const searchButton = document.createElement('button');
     searchButton.textContent = 'Search';
     searchButton.className = 'searchButton';
-    searchButton.onclick = () => searchGamesByKeyWord(gameList);
+    searchButton.onclick = () => {
+        const keyword = searchInput.value.toLowerCase();
+        displayedGames = searchGamesByKeyWord(gameList, keyword);
+        updateGamesContainer(displayedGames, homeContainer);
+    };
 
     searchContainer.appendChild(searchInput);
     searchContainer.appendChild(searchButton);
-
-    let displayedGames = gameList;
-
-    // LOAD FILTERS
-    const filterContainer = document.createElement('div');
-    filterContainer.className = 'filters';
-    filterContainer.appendChild(searchContainer); //append search
+    filterContainer.appendChild(searchContainer);
     const selectedFilters = [];
     const filterList = getFilter(gameList);
     filterList.forEach(filter => {
-        // general container for filters
         const filterDiv = document.createElement('div');
         filterDiv.className = 'filterDiv';
-        // container for the name of the filter
+
         const filterDivText = document.createElement('div');
         filterDivText.className = 'filterDivText';
         filterDivText.textContent = filter.filterName;
         filterDiv.appendChild(filterDivText);
-        // dropdown list
+
         const filterOptions = document.createElement('div');
-        filterOptions.className = 'filterOptions'
+        filterOptions.className = 'filterOptions';
         filter.filterOptions.forEach((option) => {
             const filterOptionText = document.createElement('label');
             const filterOption = document.createElement('input');
@@ -307,19 +268,14 @@ async function updateShoppingPage() {
             filterOptionText.appendChild(document.createTextNode(option.optionName));
             filterOptions.appendChild(filterOptionText);
             filterOptions.appendChild(document.createElement("br"));
+
             filterOption.addEventListener("change", () => {
-                if (filter.filterName === 'Sort By') {
-                    if (filterOption.checked) {
-                        selectedFilters.push(option.optionName);
-                    }
+                if (filterOption.checked) {
+                    selectedFilters.push(option.optionName);
                 } else {
-                    if (filterOption.checked) {
-                        selectedFilters.push(option.optionName);
-                    } else {
-                        const index = selectedFilters.indexOf(option.optionName);
-                        if (index !== -1) {
-                            selectedFilters.splice(index, 1);
-                        }
+                    const index = selectedFilters.indexOf(option.optionName);
+                    if (index !== -1) {
+                        selectedFilters.splice(index, 1);
                     }
                 }
             });
@@ -327,7 +283,7 @@ async function updateShoppingPage() {
 
         const plusSign = document.createElement('button');
         plusSign.textContent = '+';
-        plusSign.className = 'filterPlusButton'
+        plusSign.className = 'filterPlusButton';
         plusSign.addEventListener("click", () => {
             if (plusSign.textContent === '+') {
                 plusSign.textContent = '–';
@@ -338,12 +294,13 @@ async function updateShoppingPage() {
             }
         });
         filterDiv.appendChild(plusSign);
+        filterDiv.appendChild(filterOptions);
         filterContainer.appendChild(filterDiv);
-        filterContainer.appendChild(filterOptions);
     });
+
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Apply Filters';
-    confirmButton.className = 'confirmButton'
+    confirmButton.className = 'confirmButton';
     confirmButton.addEventListener("click", () => {
         const existingGamesContainer = document.querySelector('.games');
         if (existingGamesContainer) {
@@ -355,15 +312,12 @@ async function updateShoppingPage() {
         );
 
         if (nonSortingFilters.length !== 0) {
-            nonSortingFilters.forEach((filter) => {
-                displayedGames = gameList.filter((game) => {
-                    return filter === game.publisher || filter === game.category;
-                });
+            displayedGames = gameList.filter((game) => {
+                return nonSortingFilters.includes(game.publisher) || nonSortingFilters.includes(game.category);
             });
         } else {
-            displayedGames = gameList;
+            displayedGames = [...gameList];
         }
-
 
         const sortFilter = selectedFilters.filter(filter =>
             ['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
@@ -373,38 +327,26 @@ async function updateShoppingPage() {
             displayedGames = sortBy(displayedGames, filter);
         });
 
-        const newGamesContainer = loadGamesContainer(displayedGames);
-        homeContainer.appendChild(newGamesContainer);
+        updateGamesContainer(displayedGames, homeContainer);
     });
 
     filterContainer.appendChild(confirmButton);
     homeContainer.appendChild(filterContainer);
 
-    const gamesContainer = loadGamesContainer(gameList);
-    homeContainer.appendChild(gamesContainer);
+    updateGamesContainer(displayedGames, homeContainer);
 
     document.body.appendChild(homeContainer);
-
-};
-
-function searchGamesByKeyWord(gameList) {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
-
-    // Filter the games based on the search input
-    const filteredGames = gameList.filter(game =>
-        game.product_name.toLowerCase().includes(searchInput) ||
-        game.publisher.toLowerCase().includes(searchInput) ||
-        game.category.toLowerCase().includes(searchInput)
-    );
-
-    let container = document.getElementsByClassName('games');
-    if (container.length > 0) {
-        container[0].innerHTML = '';
-        loadGamesContainer(filteredGames);
-    }
-    console.log(filteredGames);
 }
 
+function updateGamesContainer(displayedGames, container) {
+    const existingGamesContainer = container.querySelector('.games');
+    if (existingGamesContainer) {
+        existingGamesContainer.remove();
+    }
+
+    const gamesContainer = loadGamesContainer(displayedGames);
+    container.appendChild(gamesContainer);
+}
 
 // CHECKOUT PAGE
 
@@ -516,9 +458,7 @@ async function updateCheckoutPage() {
             }
             const orderPlacement = await placeOrder(combinedData);
             if (orderPlacement.ok) {
-                // Clear the cart locally
                 cart = [];
-                // Refresh the cart from the server
                 await loadCart();
                 window.alert('Order placed, thank you! You will be redirected to your profile now. You will see your order there.' + newUserInfo)
                 window.location.href = '/profile';
