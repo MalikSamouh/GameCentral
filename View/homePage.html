@@ -7,7 +7,7 @@
     <title>Home Page</title>
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="js/shoppingPage.js"></script>
+    <script src="js/homePage.js" type="module"></script>
 </head>
 
 <body>
@@ -67,20 +67,6 @@
         </a>
       </div>
   </div>
-
-  <script type="module">
-    // The script provided above to load featured games dynamically
-    document.addEventListener('DOMContentLoaded', async () => {
-        await updateUserStatus();
-        await loadCart();
-
-        // Fetch the game list for the homepage
-        const gameList = await getGameList();
-        
-        // Populate the featured games on the homepage
-        populateFeaturedGames(gameList);
-    });
-  </script>
 </body>
 
 </html>

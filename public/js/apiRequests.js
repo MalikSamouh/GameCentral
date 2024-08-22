@@ -99,3 +99,65 @@ export async function isUserLoggedIn() {
         return false;
     }
 }
+
+export async function updateUserStatus() {
+    try {
+        const userInfo = await isUserLoggedIn();
+
+        const userStatusDiv = document.getElementById('login-block');
+        if (userInfo.isLoggedIn) {
+            userStatusDiv.innerHTML = `
+                <span>Hello, ${userInfo.username}</span> 
+                <div class="user-container">
+                    <img src="/images/userIcon.png" alt="User Icon" class="user-icon" id="userIcon">
+                    <div id="userMenu" class="user-menu">
+                        <a href="#" id="userProfileButton">User Profile</a>
+                        <a href="#" id="logoutButton">Logout</a>
+                    </div>
+                </div>
+            `;
+
+            const userIcon = document.getElementById('userIcon');
+            const userMenu = document.getElementById('userMenu');
+            if (userIcon) {
+                userIcon.addEventListener('click', () => {
+                    userMenu.classList.toggle('show');
+                });
+            }
+
+            const userProfileButton = document.getElementById('userProfileButton');
+            if (userProfileButton) {
+                userProfileButton.addEventListener('click', () => {
+                    window.location.href = '/profile';
+                });
+            };
+
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    const response = await fetch('/api/logout', { method: 'POST' });
+                    if (response.ok) {
+                        updateUserStatus();
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 500);
+                    } else {
+                        console.error('Logout failed');
+                    }
+                });
+            }
+
+        } else {
+            userStatusDiv.innerHTML = `
+                <a href="/signinPage">Sign in</a>
+                <span>|</span>
+                <a href="/registerPage">Register</a>
+                <img src="/images/FlagofCanada.png" alt="Canadian Flag">
+                <span>CAD</span>
+            `;
+        }
+    } catch (error) {
+        console.error('Error fetching login status:', error);
+    }
+}
