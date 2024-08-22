@@ -329,10 +329,8 @@ button:hover,
   display: block;
 }
 
-.adminStockButton {
-  display: none;
-}
-
+.adminStockButton,
+.search-container-orders, 
 .adminUserList {
   display: none;
 }
@@ -346,3 +344,4 @@ button:hover,
     align-items: center;
   }
 }
+
