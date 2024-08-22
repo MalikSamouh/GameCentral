@@ -283,7 +283,7 @@ async function updateShoppingPage() {
 
         const plusSign = document.createElement('button');
         plusSign.textContent = '+';
-        plusSign.className = 'filterPlusButton';
+        plusSign.className = 'filterPlusButton'
         plusSign.addEventListener("click", () => {
             if (plusSign.textContent === '+') {
                 plusSign.textContent = '–';
@@ -294,8 +294,8 @@ async function updateShoppingPage() {
             }
         });
         filterDiv.appendChild(plusSign);
-        filterDiv.appendChild(filterOptions);
         filterContainer.appendChild(filterDiv);
+        filterContainer.appendChild(filterOptions);
     });
 
     const confirmButton = document.createElement('button');
