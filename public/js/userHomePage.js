@@ -90,7 +90,6 @@ async function isUserLoggedIn() {
 
 // order methods
 async function getOrders(user) {
-    console.log(user);
     let orders = [];
     if (user.email === 'admin@gmail.com') {
         orders = await fetch('/api/orders');
