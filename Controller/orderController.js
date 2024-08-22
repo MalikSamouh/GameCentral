@@ -7,8 +7,8 @@ const { ObjectId } = require('mongodb');
 
 exports.putOrder = async (req, res) => {
     try {
-        const { userEmail, name, billingAddress, city, state, postalCode, country, cart, totalPrice } = req.body;
-        const user = await User.findOne({ email: userEmail });
+        const { userId, billingAddress, city, state, postalCode, country, cart, totalPrice } = req.body;
+        const user = await User.findById(userId);
         const userFullAdress = {
             address: billingAddress,
             city,
@@ -50,8 +50,9 @@ exports.getAllOrders = async (req, res) => {
 
 exports.getOrdersByUserId = async (req, res) => {
     try {
-        const userEmail = req.params.id;
-        const userOrders = await Order.find({ 'user.email': userEmail });
+        const userId = req.params.id;
+        const user = User.findById(userId);
+        const userOrders = await Order.find({ 'user': user });
         res.status(200).send(userOrders);
     } catch (error) {
         res.status(500).send(error.message);
