@@ -1,13 +1,8 @@
+import { getCart, cartAdd, cartRemove, isUserLoggedIn, getGameList, getUserInfo, updateProfile, placeOrder } from './apiRequests.js';
+
+let cart = [];
+
 // const User = require("../Model/userModel");
-async function getGameList() {
-    try {
-        const response = await fetch('api/product');
-        const items = await response.json();
-        return items;
-    } catch (error) {
-        console.error('Error fetching items:', error);
-    }
-}
 
 function getFilter(productsList) {
     const filters = [];
@@ -60,28 +55,16 @@ function sortBy(array, criteria) {
     return array;
 }
 
-async function isUserLoggedIn() {
-    try {
-        const response = await fetch('/api/checkLogin');
-        const data = await response.json();
-        return data.isLoggedIn;
-    } catch (error) {
-        console.error('Error checking login status:', error);
-        return false;
-    }
-}
-
 //initialize the cart array
 
-// test
 async function loadCart() {
     try {
-        const response = await fetch('/api/cart');
-        const data = await response.json();
-        cart = data.cart;
+        const response = await getCart();
+        cart = response.cart;
         if (window.location.pathname !== '/checkoutPage.html') {
             updateCartDisplay();
         }
+        updateCartCount(); 
     } catch (error) {
         console.error('Error loading cart:', error);
     }
@@ -89,13 +72,7 @@ async function loadCart() {
 
 async function addToCart(productName) {
     try {
-        const response = await fetch('/api/cart/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ productName, quantity: 1 }),
-        });
+        const response = await cartAdd(productName);
         const userLoggedIn = await isUserLoggedIn();
         if (!userLoggedIn) {
             window.location.href = '/signinPage';
@@ -105,6 +82,9 @@ async function addToCart(productName) {
             const data = await response.json();
             cart = data.cart;
             updateCartDisplay();
+
+            showPopup(`${productName} added to cart!`);
+            updateCartCount();
         } else {
             const error = await response.json();
             console.error('Error adding to cart:', error);
@@ -114,20 +94,54 @@ async function addToCart(productName) {
     }
 }
 
+function updateCartCount() {
+    const cartCount = document.getElementById('cartCount');
+    if (!cartCount) {
+        const cartButton = document.getElementById('cartButton');
+        const newCartCount = document.createElement('span');
+        newCartCount.id = 'cartCount';
+        newCartCount.style.backgroundColor = 'red';
+        newCartCount.style.color = 'white';
+        newCartCount.style.borderRadius = '50%';
+        newCartCount.style.padding = '2px 6px';
+        newCartCount.style.position = 'absolute';
+        newCartCount.style.top = '0';
+        newCartCount.style.right = '0';
+        cartButton.style.position = 'relative';
+        cartButton.appendChild(newCartCount);
+    }
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    document.getElementById('cartCount').textContent = totalItems;
+}
+
+function showPopup(message) {
+    const popup = document.createElement('div');
+    popup.textContent = message;
+    popup.style.position = 'fixed';
+    popup.style.top = '20px';
+    popup.style.right = '20px';
+    popup.style.backgroundColor = '#4CAF50';
+    popup.style.color = 'white';
+    popup.style.padding = '15px';
+    popup.style.borderRadius = '5px';
+    popup.style.zIndex = '1000';
+    document.body.appendChild(popup);
+
+    // Remove popup after 3 seconds
+    setTimeout(() => {
+        document.body.removeChild(popup);
+    }, 3000);
+}
+
 async function removeFromCart(productName) {
     try {
-        const response = await fetch('/api/cart/remove', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ productName }),
-        });
-
+        const response = await cartRemove(productName);
         if (response.ok) {
             const data = await response.json();
             cart = data.cart;
             updateCartDisplay();
+            updateCartCount();
+
         } else {
             const error = await response.json();
             console.error('Error removing from cart:', error);
@@ -144,7 +158,7 @@ function updateCartDisplay() {
 
     cart.forEach(item => {
         const itemElement = document.createElement('div');
-        itemElement.textContent = `${item.product.product_name} - $${item.product.price} x ${item.quantity} = $${item.product.price * item.quantity} `;
+        itemElement.textContent = `${item.product.product_name} - $${item.product.price} x ${item.quantity} = $${(item.product.price * item.quantity).toFixed(2)} `;
         const removeButton = document.createElement('button');
         removeButton.textContent = 'Remove';
         removeButton.onclick = () => removeFromCart(item.product.product_name);
@@ -159,6 +173,7 @@ function updateCartDisplay() {
 
     const cartImage = document.getElementById('shoppingCartIcon');
     cartImage.src = cart.length > 0 ? '/images/shoppingCartFull.png' : '/images/shoppingCartEmpty.png';
+    updateCartCount();
 }
 
 // GAME PAGE
@@ -247,7 +262,7 @@ async function updateShoppingPage() {
     const searchContainer = document.createElement('div'); //create a search bar
     searchContainer.className = 'searchContainer';
 
-    const searchInput = document.createElement('input'); 
+    const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.placeholder = 'Search games...';
     searchInput.id = 'searchInput';
@@ -255,7 +270,7 @@ async function updateShoppingPage() {
     const searchButton = document.createElement('button');
     searchButton.textContent = 'Search';
     searchButton.className = 'searchButton';
-    searchButton.onclick = () => performSearch(gameList);
+    searchButton.onclick = () => searchGamesByKeyWord(gameList);
 
     searchContainer.appendChild(searchInput);
     searchContainer.appendChild(searchButton);
@@ -283,8 +298,8 @@ async function updateShoppingPage() {
         filter.filterOptions.forEach((option) => {
             const filterOptionText = document.createElement('label');
             const filterOption = document.createElement('input');
-            filterOption.type = option.type || "checkbox"; 
-            filterOption.name = option.name || ''; 
+            filterOption.type = option.type || "checkbox";
+            filterOption.name = option.name || '';
             filterOption.value = option.optionName;
             filterOption.className = 'filterOption';
 
@@ -329,13 +344,13 @@ async function updateShoppingPage() {
     const confirmButton = document.createElement('button');
     confirmButton.textContent = 'Apply Filters';
     confirmButton.className = 'confirmButton'
-    confirmButton.addEventListener("click", () => {    
+    confirmButton.addEventListener("click", () => {
         const existingGamesContainer = document.querySelector('.games');
         if (existingGamesContainer) {
             existingGamesContainer.remove();
         }
-        
-        const nonSortingFilters = selectedFilters.filter((filter) => 
+
+        const nonSortingFilters = selectedFilters.filter((filter) =>
             !['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
         );
 
@@ -349,34 +364,34 @@ async function updateShoppingPage() {
             displayedGames = gameList;
         }
 
-    
+
         const sortFilter = selectedFilters.filter(filter =>
             ['Name (A-Z)', 'Name (Z-A)', 'Price (ASC)', 'Price (DESC)'].includes(filter)
         );
-    
+
         sortFilter.forEach(filter => {
             displayedGames = sortBy(displayedGames, filter);
         });
-    
+
         const newGamesContainer = loadGamesContainer(displayedGames);
         homeContainer.appendChild(newGamesContainer);
     });
-    
+
     filterContainer.appendChild(confirmButton);
     homeContainer.appendChild(filterContainer);
-    
+
     const gamesContainer = loadGamesContainer(gameList);
     homeContainer.appendChild(gamesContainer);
-    
+
     document.body.appendChild(homeContainer);
-    
+
 };
 
-function performSearch(gameList) {
+function searchGamesByKeyWord(gameList) {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
 
     // Filter the games based on the search input
-    const filteredGames = gameList.filter(game => 
+    const filteredGames = gameList.filter(game =>
         game.product_name.toLowerCase().includes(searchInput) ||
         game.publisher.toLowerCase().includes(searchInput) ||
         game.category.toLowerCase().includes(searchInput)
@@ -384,25 +399,14 @@ function performSearch(gameList) {
 
     let container = document.getElementsByClassName('games');
     if (container.length > 0) {
-        container[0].innerHTML = ''; 
-        const newValue = loadGamesContainer(filteredGames); 
-        container[0].innerHTML = newValue.innerHTML;
+        container[0].innerHTML = '';
+        loadGamesContainer(filteredGames);
     }
+    console.log(filteredGames);
 }
 
 
 // CHECKOUT PAGE
-
-async function getUserInfo() {
-    try {
-        const response = await fetch('/api/checkLogin');
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error checking login status:', error);
-        return false;
-    }
-}
 
 async function updateCheckoutPage() {
     const userInfo = await getUserInfo();
@@ -457,7 +461,7 @@ async function updateCheckoutPage() {
 
         const combinedData = {
             ...formValues,
-            userEmail: userInfo.email,
+            userId: userInfo.user._id,
             cart: cart,
             totalPrice: totalPrice,
         };
@@ -484,44 +488,33 @@ async function updateCheckoutPage() {
             });
             let newUserInfo = '';
             if (userInfo.user.billingAddress !== formData.billingAddress ||
-            userInfo.user.city !== formData.city ||
-            userInfo.user.state !== (formData.state) || 
-            userInfo.user.country !== (formData.country) || 
-            userInfo.user.postalCode !== (formData.postalCode) ||
-            userInfo.user.nameOnCard !== (formData.name) ||
-            userInfo.user.cvv !== (formData.cvv) ||
-            userInfo.user.expiryDate !== (formData.expiryDate) ||
-            userInfo.user.cardNumber !== (formData.cardNumber)) {
-                const response = await fetch('/api/updateProfile', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: userInfo.user.username,
-                        email: userInfo.user.email,
-                        billingAddress: formValues.billingAddress,
-                        city: formValues.city,
-                        state: formValues.state,
-                        country: formValues.country,
-                        postalCode: formValues.postalCode,
-                        nameOnCard: formValues.name,
-                        cardNumber: formValues.cardNumber,
-                        cvv: formValues.cvv,
-                        expiryDate: formValues.expiryDate,
-                    })
+                userInfo.user.city !== formData.city ||
+                userInfo.user.state !== (formData.state) ||
+                userInfo.user.country !== (formData.country) ||
+                userInfo.user.postalCode !== (formData.postalCode) ||
+                userInfo.user.nameOnCard !== (formData.name) ||
+                userInfo.user.cvv !== (formData.cvv) ||
+                userInfo.user.expiryDate !== (formData.expiryDate) ||
+                userInfo.user.cardNumber !== (formData.cardNumber)) {
+                const newUserData = JSON.stringify({
+                    userId: userInfo.user.id,
+                    email: userInfo.user.email,
+                    billingAddress: formValues.billingAddress,
+                    city: formValues.city,
+                    state: formValues.state,
+                    country: formValues.country,
+                    postalCode: formValues.postalCode,
+                    nameOnCard: formValues.name,
+                    cardNumber: formValues.cardNumber,
+                    cvv: formValues.cvv,
+                    expiryDate: formValues.expiryDate,
                 });
+                const response = await updateProfile(newUserData);
                 if (response.ok) {
                     newUserInfo = '\n\nYour new payment information was saved.'
+                }
             }
-        }
-            const orderPlacement = await fetch('api/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(combinedData),
-            });
+            const orderPlacement = await placeOrder(combinedData);
             if (orderPlacement.ok) {
                 // Clear the cart locally
                 cart = [];
@@ -552,11 +545,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 function populateFeaturedGames(gameList) {
     const featuredGamesContainer = document.querySelector('.game-carousel');
-    
+
     // Clear existing content to prevent duplication
     featuredGamesContainer.innerHTML = '';
 
-  // display the first three games as featured games
+    // display the first three games as featured games
     const featuredGames = gameList.slice(0, 3);
 
     featuredGames.forEach(game => {
@@ -564,7 +557,7 @@ function populateFeaturedGames(gameList) {
         gameItem.className = 'game-item';
 
         const img = document.createElement('img');
-        img.src = game.image_url;  
+        img.src = game.image_url;
         img.alt = game.product_name;
 
         const title = document.createElement('p');
@@ -578,14 +571,12 @@ function populateFeaturedGames(gameList) {
 }
 async function updateUserStatus() {
     try {
-        const response = await fetch('/api/checkLogin');
-        const data = await response.json();
+        const userInfo = await isUserLoggedIn();
 
         const userStatusDiv = document.getElementById('login-block');
-
-        if (data.isLoggedIn) {
+        if (userInfo.isLoggedIn) {
             userStatusDiv.innerHTML = `
-                <span>Hello, ${data.username}</span> 
+                <span>Hello, ${userInfo.username}</span> 
                 <div class="user-container">
                     <img src="/images/userIcon.png" alt="User Icon" class="user-icon" id="userIcon">
                     <div id="userMenu" class="user-menu">

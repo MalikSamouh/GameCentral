@@ -9,7 +9,7 @@ exports.registerUser = async (req, res) => {
   try {
     const { username, email, password, billingAddress, city, state, postalCode, country, nameOnCard, cardNumber, cvv, expiryDate  } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne.toLowerCase({ email });
     if (existingUser) {
       return res.status(400).send('User already exists');
     }
@@ -56,13 +56,14 @@ exports.loginUser = async (req, res) => {
     }
 
     // Find user by email
-    const user = await User.findOne({ email });
+    const lcEmail = email.toLowerCase();
+    const user = await User.findOne({ email: lcEmail });
     if (!user) {
+      console.log(user);
+      console.log(lcEmail);
       console.log('User not found');
       return res.status(400).send('Invalid email or password');
     }
-
-    // console.log('User found:', user);
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -110,7 +111,7 @@ exports.logoutUser = async (req, res) => {
 exports.checkLogin = async (req, res) => {
   if (req.session.userId) {
     // (req.session);
-    const user = await User.findOne({ username: req.session.username });
+    const user = await User.findById(req.session.userId);
     res.json({ isLoggedIn: true, username: req.session.username, email: req.session.email, user: user });
   } else {
     res.json({ isLoggedIn: false });
@@ -137,28 +138,42 @@ exports.getAllUsers = async (req, res) => {
 
 
 exports.updateProfile = async (req, res) => {
-  const { userId, username, email, address, city, state, country, postalCode, cardNumber, nameOnCard, cvv, expiryDate } = req.body;
+  const { username, email, billingAddress, city, state, country, postalCode, cardNumber, nameOnCard, cvv, expiryDate } = req.body;
 
   try {
-    const currentUserName = req.session.username;
-    const updateFields = {};
+    // Use the userId from the session instead of the username
+    const userId = req.session.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
 
-    updateFields.username = username;
-    updateFields.email = email;
-    updateFields.billingAddress = address;
-    updateFields.city = city;
-    updateFields.state = state;
-    updateFields.country = country;
-    updateFields.postalCode = postalCode;
-    updateFields.cardNumber = cardNumber;
-    updateFields.nameOnCard = nameOnCard;
-    updateFields.cvv = cvv;
-    updateFields.expiryDate = expiryDate;
+    const updateFields = {
+      username,
+      email,
+      billingAddress,
+      city,
+      state,
+      country,
+      postalCode,
+      cardNumber,
+      nameOnCard,
+      cvv,
+      expiryDate
+    };
 
-    // Update the user's profile
-    await User.findOneAndUpdate({username: currentUserName}, {$set: updateFields});
+    // Update the user's profile using findByIdAndUpdate
+    const updatedUser = await User.findByIdAndUpdate(userId, { $set: updateFields }, { new: true });
 
-    res.status(200).json({ message: 'Profile updated successfully' });
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update the session with the new username and email
+    req.session.username = updatedUser.username;
+    req.session.email = updatedUser.email;
+
+    res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
   } catch (error) {
     console.error('Error updating profile:', error);
     res.status(500).json({ message: 'Failed to update profile' });
@@ -191,7 +206,6 @@ exports.updateUserById = async (req, res) => {
         user.cvv = updatedUserData.cvv || user.cvv;
         user.expiryDate = updatedUserData.expiryDate || user.expiryDate;
 
-        await user.save();
         console.log('User updated successfully');
 
         res.status(200).send({ message: 'User updated successfully' });

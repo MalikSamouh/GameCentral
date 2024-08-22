@@ -8,7 +8,6 @@ body {
   margin-top: 7rem;
   padding: 0;
   height: 100%;
-  flex-direction: column;
 }
 
 header {
@@ -48,12 +47,11 @@ header {
 }
 
 .container {
-  max-width: 600px;
+  max-width: 400px;
   margin: 0 auto;
   padding: 50px 20px;
   text-align: center;
 }
-
 
 h1 {
   font-size: 24px;
@@ -202,7 +200,6 @@ button:hover,
   background-color: #4a5ef8;
   color: white;
   cursor: pointer;
-  margin-bottom: 30px; /* Adds space below the Shop button */
 }
 
 .product-card {

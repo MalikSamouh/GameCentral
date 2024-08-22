@@ -94,7 +94,7 @@ async function getOrders(user) {
     if (user.email === 'admin@gmail.com') {
         orders = await fetch('/api/orders');
     } else {
-        orders = await fetch(`/api/orders/${user.email}`);
+        orders = await fetch(`/api/orders/${user.user._id}`);
     }
     return orders;
 };
