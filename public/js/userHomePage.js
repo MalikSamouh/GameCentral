@@ -90,11 +90,12 @@ async function isUserLoggedIn() {
 
 // order methods
 async function getOrders(user) {
+    console.log(user);
     let orders = [];
     if (user.email === 'admin@gmail.com') {
         orders = await fetch('/api/orders');
     } else {
-        orders = await fetch(`/api/orders/${user.id}`);
+        orders = await fetch(`/api/orders/${user.user._id}`);
     }
     return orders;
 };
