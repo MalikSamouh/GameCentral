@@ -109,28 +109,40 @@ async function removeFromCart(productName) {
 
 function updateCartDisplay() {
     const cartContainer = document.getElementById('cartItems');
+    const totalPriceDiv = document.getElementById('totalPriceDiv');
     cartContainer.innerHTML = '';
     let totalPrice = 0;
 
     cart.forEach(item => {
         const itemElement = document.createElement('div');
-        itemElement.textContent = `${item.product.product_name} - $${item.product.price} x ${item.quantity} = $${(item.product.price * item.quantity).toFixed(2)} `;
+        itemElement.style.display = 'flex'; 
+        itemElement.style.justifyContent = 'space-between'; 
+        itemElement.style.justifyContent = 'space-between'; 
+        itemElement.style.alignItems = 'center'; 
+        itemElement.style.marginBottom = '10px';
+
+        const itemText = document.createElement('span');
+        itemText.textContent = `${item.product.product_name} - $${item.product.price} x ${item.quantity} = $${(item.product.price * item.quantity).toFixed(2)}`;
+        
         const removeButton = document.createElement('button');
         removeButton.textContent = 'Remove';
+        removeButton.style.marginLeft = '10px'; 
         removeButton.onclick = () => removeFromCart(item.product.product_name);
+
+        itemElement.appendChild(itemText);
         itemElement.appendChild(removeButton);
         cartContainer.appendChild(itemElement);
+
         totalPrice += item.product.price * item.quantity;
     });
 
-    const totalPriceDiv = document.createElement('div');
-    totalPriceDiv.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
-    cartContainer.appendChild(totalPriceDiv);
+    totalPriceDiv.innerHTML = `<strong>Total Price: $${totalPrice.toFixed(2)}</strong>`;
 
     const cartImage = document.getElementById('shoppingCartIcon');
     cartImage.src = cart.length > 0 ? '/images/shoppingCartFull.png' : '/images/shoppingCartEmpty.png';
     updateCartCount();
 }
+
 
 // GAME PAGE
 const loadGamesContainer = (displayedGames) => {
