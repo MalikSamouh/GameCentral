@@ -249,6 +249,8 @@ button:hover,
   width: 30%;
   height: 100%;
   overflow: auto;
+  position: relative;
+  padding-bottom: 60px; 
 }
 
 #admin-modal-content {
@@ -345,3 +347,18 @@ button:hover,
   }
 }
 
+
+#checkoutSection {
+  position: absolute;
+  bottom: 70px; 
+  width: 100%; 
+  text-align: center;
+}
+
+#totalPriceDiv {
+  font-weight: bold; 
+}
+
+#checkoutButton {
+  margin-top: 0px;
+}
