@@ -161,3 +161,65 @@ export async function updateUserStatus() {
         console.error('Error fetching login status:', error);
     }
 }
+
+// api.js
+
+export async function checkLogin() {
+    try {
+        const response = await fetch('/api/checkLogin');
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.json();
+    } catch (error) {
+        console.error('Error checking login status:', error);
+        throw error;
+    }
+}
+
+export async function logout() {
+    try {
+        const response = await fetch('/api/logout', { method: 'POST' });
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.ok;
+    } catch (error) {
+        console.error('Error logging out:', error);
+        throw error;
+    }
+}
+
+export async function getOrders(user) {
+    try {
+        const url = user.email === 'admin@gmail.com' ? '/api/orders' : `/api/orders/${user.userId}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        throw error;
+    }
+}
+
+export async function getUsers() {
+    try {
+        const response = await fetch('/api/users');
+        if (!response.ok) throw new Error('Network response was not ok');
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
+}
+
+export async function updateProductStock(stockData) {
+    try {
+        const response = await fetch('/api/product', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(stockData)
+        });
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.ok;
+    } catch (error) {
+        console.error('Error updating product stock:', error);
+        throw error;
+    }
+}

@@ -1,126 +1,5 @@
-let isUpdating = false;
-
-async function updateUserStatus() {
-
-    isUpdating = true;
-
-    try {
-        const response = await fetch('/api/checkLogin');
-        const data = await response.json();
-
-        const userStatusDiv = document.getElementById('login-block');
-
-        if (data.isLoggedIn) {
-            userStatusDiv.innerHTML = `
-                <span>Hello, ${data.username}</span> 
-                <div class="user-container">
-                    <img src="/images/userIcon.png" alt="User Icon" class="user-icon" id="userIcon">
-                    <div id="userMenu" class="user-menu">
-                        <a href="#" id="userProfileButton">User Profile</a>
-                        <a href="#" id="logoutButton">Logout</a>
-                    </div>
-                </div>
-            `;
-
-            const userIcon = document.getElementById('userIcon');
-            const userMenu = document.getElementById('userMenu');
-            if (userIcon) {
-                userIcon.addEventListener('click', () => {
-                    userMenu.classList.toggle('show');
-                });
-            }
-
-            const userProfileButton = document.getElementById('userProfileButton');
-            if (userProfileButton) {
-                userProfileButton.addEventListener('click', () => {
-                    window.location.href = '/profile';
-                });
-            };
-
-            const logoutButton = document.getElementById('logoutButton');
-            if (logoutButton) {
-                logoutButton.addEventListener('click', async (event) => {
-                    event.preventDefault();
-                    const response = await fetch('/api/logout', { method: 'POST' });
-                    if (response.ok) {
-                        updateUserStatus();
-                        setTimeout(() => {
-                            window.location.href = '/';
-                        }, 500);
-                    } else {
-                        console.error('Logout failed');
-                    }
-                });
-            }
-            if (data.isAdmin || data.email === 'admin@gmail.com') { //added when admin can only edit users info
-                document.getElementById('adminStockButton').style.display = 'block';
-            } else {
-                document.getElementById('adminStockButton').style.display = 'none';
-            }
-
-
-        } else {
-            userStatusDiv.innerHTML = `
-                <a href="/signinPage">Sign in</a>
-                <span>|</span>
-                <a href="/registerPage">Register</a>
-                <img src="/images/FlagofCanada.png" alt="Canadian Flag">
-                <span>CAD</span>
-            `;
-        }
-    } catch (error) {
-        console.error('Error fetching login status:', error);
-    }
-    finally {
-        isUpdating = false;
-    }
-}
-document.addEventListener('DOMContentLoaded', updateUserStatus);
-
-async function isUserLoggedIn() {
-    try {
-        const response = await fetch('/api/checkLogin');
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error checking login status:', error);
-        return false;
-    }
-}
-
-// order methods
-async function getOrders(user) {
-    let orders = [];
-    if (user.email === 'admin@gmail.com') {
-        orders = await fetch('/api/orders');
-    } else {
-        orders = await fetch(`/api/orders/${user.user._id}`);
-    }
-    return orders;
-};
-
-async function addOrder(orders) {
-    const options = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orders })
-    };
-    await fetch('/orders', options);
-}
-
-function searchOrdersByUsername(orderList, userEmail) {
-    const searchInput = document.getElementById('searchInputOrders').value.toLowerCase();
-
-    const filteredOrders = orderList.filter(order =>
-        order.user.username.toLowerCase().includes(searchInput) ||
-        order.user.email.toLowerCase().includes(searchInput)
-    );
-
-    const ordersDiv = document.getElementById("orders-container");
-    ordersDiv.innerHTML = '';
-    displayOrderDetails(filteredOrders, userEmail);
-}
-
+import { updateUserStatus, updateProfile, getOrders, isUserLoggedIn } from "./apiRequests.js";
+import { searchOrdersByUsername } from "./filters.js";
 
 async function displayOrderDetails(orders, userEmail) {
     const detailsDiv = document.getElementById('orders-container');
@@ -244,9 +123,9 @@ async function saveOrderChanges(orderId, orderIndex) {
 }
 // load content on page
 document.addEventListener('DOMContentLoaded', async () => {
+    await updateUserStatus();
     await fetchUsersAndCreateButtons();
 
-    const editButton = document.querySelector('.edit-user-button');
     updateUserStatus();
 
     attachEditButtonListeners();
@@ -344,38 +223,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profileForm = document.getElementById('editProfileForm');
     profileForm.addEventListener('submit', async function (event) {
         event.preventDefault();
-        const updatedUsername = document.getElementById('editUsername').value;
-        const updatedEmail = document.getElementById('editEmail').value;
-        const updatedAddress = document.getElementById('editAddress').value;
-        const updatedCity = document.getElementById('editCity').value;
-        const updatedState = document.getElementById('editState').value;
-        const updatedCountry = document.getElementById('editCountry').value;
-        const updatedPostalCode = document.getElementById('editPostalCode').value;
-        const updatedNameOnCard = document.getElementById('editNameOnCard').value;
-        const updatedCardNumber = document.getElementById('editCardNumber').value;
-        const updatedCvv = document.getElementById('editCvv').value;
-        const updatedExpiryDate = document.getElementById('editExpiryDate').value;
-
+        const newUserInfo = {
+            username: document.getElementById('editUsername').value,
+            email: document.getElementById('editEmail').value,
+            billingAddress: document.getElementById('editAddress').value,
+            city: document.getElementById('editCity').value,
+            state: document.getElementById('editState').value,
+            country: document.getElementById('editCountry').value,
+            postalCode: document.getElementById('editPostalCode').value,
+            nameOnCard: document.getElementById('editNameOnCard').value,
+            cardNumber: document.getElementById('editCardNumber').value,
+            cvv: document.getElementById('editCvv').value,
+            expiryDate: document.getElementById('editExpiryDate').value,
+        }
         try {
-            const response = await fetch('/api/updateProfile', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: updatedUsername,
-                    email: updatedEmail,
-                    billingAddress: updatedAddress,
-                    city: updatedCity,
-                    state: updatedState,
-                    country: updatedCountry,
-                    postalCode: updatedPostalCode,
-                    nameOnCard: updatedNameOnCard,
-                    cardNumber: updatedCardNumber,
-                    cvv: updatedCvv,
-                    expiryDate: updatedExpiryDate,
-                })
-            });
+            const response = await updateProfile(JSON.stringify(newUserInfo))
 
             if (response.ok) {
                 alert('Profile updated successfully!');
@@ -455,8 +317,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         userDiv.style.display = "block";
     }
 
-    const ordersFetch = await getOrders(userLoggedIn);
-    const orders = await ordersFetch.json();
+    const orders = await getOrders(userLoggedIn.user);
     const searchButton = document.getElementById('searchButtonOrders');
     searchButton.addEventListener('click', () => searchOrdersByUsername(orders, userLoggedIn.email));
 
@@ -467,40 +328,6 @@ async function getUserList() {
     const users = await response.json();
     return users;
 }
-
-document.getElementById('editUserForm').addEventListener('submit', async function (event) {
-    event.preventDefault();
-
-    const userId = document.getElementById('editUserId').value;
-    const updatedUsername = document.getElementById('editUserUsername').value;
-    const updatedEmail = document.getElementById('editUserEmail').value;
-
-    try {
-        const response = await fetch(`/api/users/${userId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: updatedUsername,
-                email: updatedEmail,
-            })
-        });
-
-        if (response.ok) {
-            alert('User information updated successfully!');
-            document.getElementById('editUserModal').style.display = 'none';
-            window.location.reload();  // Reload the page to reflect the changes
-        } else {
-            alert('Failed to update user information.');
-        }
-    } catch (error) {
-        console.error('Error updating user:', error);
-    }
-
-    await fetchUsersAndCreateButtons();
-    attachEditButtonListeners();
-});
 
 //from here
 async function fetchUsersAndCreateButtons() {
@@ -601,7 +428,6 @@ function updateUserUI(userLoggedIn) {
     document.getElementById('cvv').innerHTML = userLoggedIn.user.cvv;
     document.getElementById('expiryDate').innerHTML = userLoggedIn.user.expiryDate;
 
-    // Pre-fill form fields with user data
     document.getElementById('editUsername').value = userLoggedIn.username;
     document.getElementById('editEmail').value = userLoggedIn.email;
     document.getElementById('editAddress').value = userLoggedIn.user.billingAddress;

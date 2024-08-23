@@ -60,3 +60,16 @@ export function searchGamesByKeyWord(gameList) {
     );
     return filteredGames;
 }
+
+export function searchOrdersByUsername(orderList, userEmail) {
+    const searchInput = document.getElementById('searchInputOrders').value.toLowerCase();
+
+    const filteredOrders = orderList.filter(order =>
+        order.user.username.toLowerCase().includes(searchInput) ||
+        order.user.email.toLowerCase().includes(searchInput)
+    );
+
+    const ordersDiv = document.getElementById("orders-container");
+    ordersDiv.innerHTML = '';
+    displayOrderDetails(filteredOrders, userEmail);
+}
