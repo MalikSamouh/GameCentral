@@ -180,10 +180,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     span.onclick = function () {
         editFormContainer.style.display = "none";
     }
-    window.editUser = function (userId) {
-        document.getElementById('editUserId').value = user._id;
-        document.getElementById('editUserUsername').value = user.username;
-        document.getElementById('editUserEmail').value = user.email;
+    window.editUser = function () {
+        document.getElementById('editUserId').value = userLoggedIn.user._id;
+        document.getElementById('editUserUsername').value = userLoggedIn.username;
+        document.getElementById('editUserEmail').value = userLoggedIn.email;
 
 
     };

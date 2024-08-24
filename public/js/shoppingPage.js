@@ -30,7 +30,7 @@ async function addToCart(productName) {
     try {
         const response = await cartAdd(productName);
         const userLoggedIn = await isUserLoggedIn();
-        if (!userLoggedIn) {
+        if (!userLoggedIn.isLoggedIn) {
             window.location.href = '/signinPage';
             return;
         }

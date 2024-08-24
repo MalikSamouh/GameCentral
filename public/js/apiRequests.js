@@ -188,7 +188,8 @@ export async function logout() {
 
 export async function getOrders(user) {
     try {
-        const url = user.email === 'admin@gmail.com' ? '/api/orders' : `/api/orders/${user.userId}`;
+        console.log(user);
+        const url = user.isAdmin ? '/api/orders' : `/api/orders/${user._id}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Network response was not ok');
         return await response.json();
