@@ -67,20 +67,6 @@ label {
   margin-bottom: 10px;
   text-align: left;
 }
-/* 
-.search-container {
-  margin-bottom: 15px;
-}
-
-.search-input {
-  padding: 5px;
-  width: 200px;
-}
-
-.search-button {
-  padding: 5px 10px;
-  margin-left: 5px;
-} */
 input {
   padding: 10px;
   margin-bottom: 20px;
@@ -346,7 +332,6 @@ button:hover,
     align-items: center;
   }
 }
-
 
 #checkoutSection {
   position: absolute;
