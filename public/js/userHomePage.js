@@ -148,7 +148,7 @@ async function displayOrderDetails(orders, userEmail) {
         order.items.forEach(item => {
             innerHTML += `<li>${item.product[0].product_name} x ${item.quantity} = ${(item.quantity * item.product[0].price).toFixed(2)}</li>`;
         });
-        innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price}<br>`;
+        innerHTML += `</ul><br><strong>Total Price:</strong> ${order.total_price.toFixed(2)}<br>`;
         if (userEmail === 'admin@gmail.com') {
             innerHTML += `
                 <button class="edit-order-btn" data-order-id="${order._id}" data-order-index="${index}">Edit Order</button>
@@ -405,6 +405,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 modal.style.display = "none";
             }
         }
+        const btnSearch = document.getElementById("search-container-orders");
+        btnSearch.style.display = "block";
         const modalBody = document.getElementById('admin-restock-form');
         products.forEach(product => {
             const productLabel = document.createElement('label');

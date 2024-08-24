@@ -315,10 +315,8 @@ button:hover,
   display: block;
 }
 
-.adminStockButton {
-  display: none;
-}
-
+.adminStockButton,
+.search-container-orders, 
 .adminUserList {
   display: none;
 }
@@ -331,107 +329,4 @@ button:hover,
     margin-left: 3rem;
     align-items: center;
   }
-  
-}
-
-
-.about-us-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px;
-  font-family: Arial, sans-serif;
-}
-
-.about-us-container h1, h2 {
-  font-weight: bold;
-  color: #333;
-}
-
-.about-us-container p {
-  line-height: 1.6;
-  margin-bottom: 20px;
-  color: #555;
-}
-
-.about-us-container ul {
-  list-style-type: none;
-  padding: 0;
-}
-.about-us-info {
-  text-align: left;
-  margin-top: 40px;
-}
-.about-us-info h2 {
-  font-size: 20px;
-  color: #333;
-}
-.about-us-info p {
-  line-height: 1.6;
-  margin-bottom: 20px;
-  color: #555;
-}
-.about-us-container li {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.social-media-icons {
-  display: flex;
-  justify-content: center; 
-  gap: 30px; 
-  margin-top: 30px; /* Adds space above the social media icons */
-}
-
-.social-icon {
-  font-size: 24px;
-  color: #4a5ef8;
-  text-decoration: none;
-}
-
-
-.social-icon:hover {
-  color: #3a4cc8;
-}
-
-.footer-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  margin-top: -20px; /* Adjust this if necessary */
-}
-.game-carousel {
-  display: flex;
-  justify-content: center;
-  gap: 20px; /* Adds space between the games */
-  margin-bottom: 30px; /* Adds space below the carousel */
-}
-
-.game-item {
-  text-align: center;
-  margin: 10px;
-}
-
-.game-item img {
-  width: 100px; /* Adjust the width as needed */
-  height: auto; /* Maintain aspect ratio */
-  border-radius: 5px; /* Optional: Adds rounded corners to the images */
-}
-.price-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 5px;
-}
-
-.old-price {
-  text-decoration: line-through;
-  color: #a9a9a9;
-  margin-right: 10px;
-  font-size: 14px;
-}
-
-.new-price {
-  color: #ff4500;
-  font-weight: bold;
-  font-size: 16px;
 }
