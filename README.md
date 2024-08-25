@@ -6,3 +6,7 @@ Welcome to GameCentral, your one-stop digital storefront for all your favorite v
 2. Run ```npm install``` to install all node modules needed for our project.
 3. Run ```npm start``` to start the project.
 4. To access the website, in your browser open ```http://localhost:3001/```.
+
+# Admin credentials
+Login: ```admin@gmail.com```
+Password: ```Admin@123```
