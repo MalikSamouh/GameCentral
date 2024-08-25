@@ -162,8 +162,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const users = await getUserList();
         loadUsersContainer(users);
         updateUserUI(userLoggedIn);
-
-        // Set up search button event listener
         const searchButton = document.getElementById('searchButton');
         searchButton.addEventListener('click', () => performUserSearch(users));
     }
@@ -188,13 +186,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     };
 
-    // Close the modal when the 'x' is clicked
     const closeEditModalSpan = document.getElementsByClassName("adminEditClose")[0];
     closeEditModalSpan.onclick = function () {
         document.getElementById('adminEditModal').style.display = "none";
     }
 
-    // Close the modal when clicking outside of it
     window.onclick = function (event) {
         const editModal = document.getElementById('adminEditModal');
         if (event.target == editModal) {
@@ -206,7 +202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     editButtons.forEach(button => {
         button.addEventListener('click', (event) => {
-            alert('Edit button clicked');  // Just for testing
             const userId = event.target.getAttribute('data-user-id');
             editUser(userId);
         });
@@ -329,7 +324,6 @@ async function getUserList() {
     return users;
 }
 
-//from here
 async function fetchUsersAndCreateButtons() {
     try {
         const response = await fetch('/api/users');
@@ -339,8 +333,6 @@ async function fetchUsersAndCreateButtons() {
         users.forEach(user => {
             const userContainer = document.createElement('div');
             userContainer.classList.add('user-container');
-
-            // Creating an edit button for each user
             const editButton = document.createElement('button');
             editButton.textContent = 'Edit';
             editButton.className = 'edit-user-button';
@@ -393,7 +385,6 @@ function attachEditButtonListeners() {
 
     editButtons.forEach(button => {
         button.addEventListener('click', (event) => {
-            alert('Edit button clicked'); // Testing feedback
             const userId = event.target.getAttribute('data-user-id');
             editUser(userId);
         });

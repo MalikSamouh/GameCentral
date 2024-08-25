@@ -1,9 +1,7 @@
 const bcrypt = require('bcryptjs');
 const Order = require('../Model/orderModel');
 const User = require('../Model/userModel');
-const Product = require('../Model/productModel');
 const Cart = require('../Model/cartModel')
-const { ObjectId } = require('mongodb');
 
 exports.putOrder = async (req, res) => {
     try {
@@ -63,22 +61,18 @@ exports.updateOrder = async (req, res) => {
         const orderId = req.params.id;
         const updatedOrderData = req.body;
 
-        // Find the order
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // Update order details
         order.user.username = updatedOrderData.user.username;
         order.user.email = updatedOrderData.user.email;
         order.user_address = updatedOrderData.user_address;
         order.status = updatedOrderData.status;
 
-        // Save the updated order
         await order.save();
 
-        // Update the user information if it has changed
         const user = await User.findOne({ email: order.user.email });
         if (user) {
             user.username = updatedOrderData.user.username;

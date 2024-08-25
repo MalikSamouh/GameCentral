@@ -6,7 +6,7 @@ const productController = require('./Controller/productController');
 const orderController = require('./Controller/orderController');
 
 
-// User routes
+// user
 router.post('/register', userController.registerUser);
 router.post('/signin', userController.loginUser);
 router.get('/checkLogin',userController.checkLogin);
@@ -15,14 +15,14 @@ router.get('/users', userController.getAllUsers);
 router.post('/updateProfile', userController.updateProfile);
 
 
-// Product routes
+// product
 router.get('/product', productController.getProducts);
 router.put('/product', productController.updateStock);
 router.post('/product', productController.removeProductsFromStock);
 router.put('/users/:userId', userController.updateUserById);
 
 
-// Cart routes
+// cart
 router.post('/cart/add', cartController.addToCart);
 router.post('/cart/remove', cartController.removeFromCart);
 router.get('/cart', cartController.getCart);

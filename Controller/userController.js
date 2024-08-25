@@ -2,9 +2,6 @@ const bcrypt = require('bcryptjs');
 const User = require('../Model/userModel');
 const cartController = require('./cartController');
 
-// const Cart = require('../Model/cartModel');
-// const Product = require('../Model/productModel');
-
 exports.registerUser = async (req, res) => {
   try {
     const { username, email, password, billingAddress, city, state, postalCode, country, nameOnCard, cardNumber, cvv, expiryDate  } = req.body;
@@ -47,7 +44,6 @@ exports.registerUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
-    // ('Request body:', req.body);
 
     const { email, password } = req.body;
 
@@ -55,7 +51,6 @@ exports.loginUser = async (req, res) => {
       return res.status(400).send('Email and password are required');
     }
 
-    // Find user by email
     const lcEmail = email.toLowerCase();
     const user = await User.findOne({ email: lcEmail });
     if (!user) {
@@ -68,7 +63,6 @@ exports.loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.log('Password does not match');
-      // res.status(400).sho
       return res.status(400).send('Invalid email or password');
     }
 
@@ -76,8 +70,6 @@ exports.loginUser = async (req, res) => {
     req.session.username = user.username;
     req.session.email = user.email;
 
-    // const cart = await Cart.findOne({ user: user._id }).populate('items.product');
-    // req.session.cart = cart ? cart.items : [];
     req.session.cart = await cartController.loadCart(user._id);
 
     res.redirect('/shoppingPage');
@@ -90,7 +82,6 @@ exports.loginUser = async (req, res) => {
 
 exports.logoutUser = async (req, res) => {
   try {
-    // Save the cart to the database before destroying the session
     if (req.session.userId && req.session.cart) {
       await cartController.saveCart(req.session.userId, req.session.cart);
     }
@@ -110,7 +101,6 @@ exports.logoutUser = async (req, res) => {
 
 exports.checkLogin = async (req, res) => {
   if (req.session.userId) {
-    // (req.session);
     const user = await User.findById(req.session.userId);
     res.json({ isLoggedIn: true, username: req.session.username, email: req.session.email, user: user });
   } else {
@@ -141,7 +131,6 @@ exports.updateProfile = async (req, res) => {
   const { username, email, billingAddress, city, state, country, postalCode, cardNumber, nameOnCard, cvv, expiryDate } = req.body;
 
   try {
-    // Use the userId from the session instead of the username
     const userId = req.session.userId;
     
     if (!userId) {
@@ -162,14 +151,12 @@ exports.updateProfile = async (req, res) => {
       expiryDate
     };
 
-    // Update the user's profile using findByIdAndUpdate
     const updatedUser = await User.findByIdAndUpdate(userId, { $set: updateFields }, { new: true });
 
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update the session with the new username and email
     req.session.username = updatedUser.username;
     req.session.email = updatedUser.email;
 
@@ -179,9 +166,6 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Failed to update profile' });
   }
 };
-// Controller/userController.js
-
-//const User = require('../Model/userModel');
 
 exports.updateUserById = async (req, res) => {
     const userId = req.params.userId;
@@ -194,7 +178,6 @@ exports.updateUserById = async (req, res) => {
             return res.status(404).send({ message: 'User not found' });
         }
 
-        // Update user fields
         user.username = updatedUserData.username || user.username;
         user.billingAddress = updatedUserData.billingAddress || user.billingAddress;
         user.city = updatedUserData.city || user.city;

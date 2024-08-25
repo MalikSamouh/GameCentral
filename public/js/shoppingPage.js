@@ -4,9 +4,6 @@ import {
     cartRemove,
     isUserLoggedIn,
     getGameList,
-    getUserInfo,
-    updateProfile,
-    placeOrder,
     updateUserStatus,
 } from './apiRequests.js';
 import { getFilter, sortBy, searchGamesByKeyWord } from './filters.js';
@@ -83,7 +80,6 @@ function showPopup(message) {
     popup.style.zIndex = '1000';
     document.body.appendChild(popup);
 
-    // Remove popup after 3 seconds
     setTimeout(() => {
         document.body.removeChild(popup);
     }, 3000);
@@ -360,135 +356,9 @@ function updateGamesContainer(displayedGames, container) {
     container.appendChild(gamesContainer);
 }
 
-// CHECKOUT PAGE
-
-async function updateCheckoutPage() {
-    const userInfo = await getUserInfo();
-    const cartSummary = document.getElementById('cartSummary');
-    if (!userInfo.isLoggedIn) {
-        window.location.href = '/signinPage';
-        return;
-    }
-    let totalPrice = 0.0;
-    if (cartSummary) {
-        cartSummary.innerHTML = '';
-        if (cart.length === 0) {
-            cartSummary.textContent = "Your cart is empty.";
-            window.alert("Your cart is empty. Add something before checking out.");
-            window.location.href = '/shoppingPage';
-        } else {
-            cart.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.textContent = `${item.product.product_name} - $${item.product.price} x ${item.quantity} = $${(item.product.price * item.quantity).toFixed(2)}`;
-                cartSummary.appendChild(itemElement);
-                totalPrice += item.product.price * item.quantity;
-            });
-
-            const totalElement = document.createElement('div');
-            totalElement.textContent = `Total: $${totalPrice.toFixed(2)}`;
-            cartSummary.appendChild(totalElement);
-            const billingAddress = document.getElementById('billingAddress');
-            billingAddress.value = `${userInfo.user.billingAddress}`;
-            const city = document.getElementById('city');
-            city.value = `${userInfo.user.city}`;
-            const state = document.getElementById('state');
-            state.value = `${userInfo.user.state}`;
-            const country = document.getElementById('country');
-            country.value = `${userInfo.user.country}`;
-            const postalCode = document.getElementById('postalCode');
-            postalCode.value = `${userInfo.user.postalCode}`;
-
-            const nameOnCard = document.getElementById('name');
-            nameOnCard.value = `${userInfo.user.nameOnCard}`;
-            const cardNumber = document.getElementById('cardNumber');
-            cardNumber.value = `${userInfo.user.cardNumber}`;
-            const cvv = document.getElementById('cvv');
-            cvv.value = `${userInfo.user.cvv}`;
-            const expiryDate = document.getElementById('expiryDate');
-            expiryDate.value = `${userInfo.user.expiryDate}`;
-        }
-    }
-    document.getElementById('payment-form').addEventListener('submit', async function (event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const formValues = Object.fromEntries(formData.entries());
-
-        const combinedData = {
-            ...formValues,
-            userId: userInfo.user._id,
-            cart: cart,
-            totalPrice: totalPrice,
-        };
-        let stockError = 'There was an error with placing your order: \n';
-        let outOfStockError = false;
-        cart.forEach(item => {
-            if (item.product.quantity_in_stock - item.quantity < 0) {
-                outOfStockError = true;
-                stockError += `${item.product.product_name} is not available in this quantity. Current stock quantity: ${item.product.quantity_in_stock}.\n`;
-            }
-        });
-
-        if (outOfStockError) {
-            stockError += "Please, adjust your order accordingly."
-            window.alert(stockError);
-            window.location.href = '/shoppingPage';
-        } else {
-            await fetch('api/product', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(cart),
-            });
-            let newUserInfo = '';
-            if (userInfo.user.billingAddress !== formData.billingAddress ||
-                userInfo.user.city !== formData.city ||
-                userInfo.user.state !== (formData.state) ||
-                userInfo.user.country !== (formData.country) ||
-                userInfo.user.postalCode !== (formData.postalCode) ||
-                userInfo.user.nameOnCard !== (formData.name) ||
-                userInfo.user.cvv !== (formData.cvv) ||
-                userInfo.user.expiryDate !== (formData.expiryDate) ||
-                userInfo.user.cardNumber !== (formData.cardNumber)) {
-                const newUserData = JSON.stringify({
-                    userId: userInfo.user.id,
-                    email: userInfo.user.email,
-                    billingAddress: formValues.billingAddress,
-                    city: formValues.city,
-                    state: formValues.state,
-                    country: formValues.country,
-                    postalCode: formValues.postalCode,
-                    nameOnCard: formValues.name,
-                    cardNumber: formValues.cardNumber,
-                    cvv: formValues.cvv,
-                    expiryDate: formValues.expiryDate,
-                });
-                const response = await updateProfile(newUserData);
-                if (response.ok) {
-                    newUserInfo = '\n\nYour new payment information was saved.'
-                }
-            }
-            const orderPlacement = await placeOrder(combinedData);
-            if (orderPlacement.ok) {
-                cart = [];
-                await loadCart();
-                window.alert('Order placed, thank you! You will be redirected to your profile now. You will see your order there.' + newUserInfo)
-                window.location.href = '/profile';
-            } else {
-                console.log(orderPlacement.error);
-            }
-        }
-    });
-};
-
 // PAGES LOAD
 document.addEventListener('DOMContentLoaded', async () => {
     updateUserStatus();
     await loadCart();
-
-    if (window.location.pathname === '/checkoutPage.html') {
-        updateCheckoutPage();
-    } else {
         updateShoppingPage();
-    }
 });

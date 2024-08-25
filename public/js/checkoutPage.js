@@ -1,5 +1,3 @@
-// checkout.js
-
 import { getUserInfo, updateProfile, placeOrder, getCart, updateUserStatus } from './apiRequests.js';
 
 let cart = [];

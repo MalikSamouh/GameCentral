@@ -52,7 +52,6 @@ export function sortBy(array, criteria) {
 export function searchGamesByKeyWord(gameList) {
     const searchInput = document.getElementById('searchInput').value.toLowerCase();
 
-    // Filter the games based on the search input
     const filteredGames = gameList.filter(game =>
         game.product_name.toLowerCase().includes(searchInput) ||
         game.publisher.toLowerCase().includes(searchInput) ||

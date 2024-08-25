@@ -162,8 +162,6 @@ export async function updateUserStatus() {
     }
 }
 
-// api.js
-
 export async function checkLogin() {
     try {
         const response = await fetch('/api/checkLogin');
