@@ -188,7 +188,6 @@ export async function logout() {
 
 export async function getOrders(user) {
     try {
-        console.log(user);
         const url = user.isAdmin ? '/api/orders' : `/api/orders/${user._id}`;
         const response = await fetch(url);
         if (!response.ok) throw new Error('Network response was not ok');
