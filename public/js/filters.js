@@ -60,7 +60,7 @@ export function searchGamesByKeyWord(gameList) {
     return filteredGames;
 }
 
-export function searchOrdersByUsername(orderList, userEmail) {
+export function searchOrdersByUsername(orderList) {
     const searchInput = document.getElementById('searchInputOrders').value.toLowerCase();
 
     const filteredOrders = orderList.filter(order =>
@@ -68,7 +68,5 @@ export function searchOrdersByUsername(orderList, userEmail) {
         order.user.email.toLowerCase().includes(searchInput)
     );
 
-    const ordersDiv = document.getElementById("orders-container");
-    ordersDiv.innerHTML = '';
-    displayOrderDetails(filteredOrders, userEmail);
+    return filteredOrders;
 }

@@ -314,7 +314,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const orders = await getOrders(userLoggedIn.user);
     const searchButton = document.getElementById('searchButtonOrders');
-    searchButton.addEventListener('click', () => searchOrdersByUsername(orders, userLoggedIn.email));
+    searchButton.addEventListener('click', () => {
+        const newOrders = searchOrdersByUsername(orders);
+        const ordersDiv = document.getElementById("orders-container");
+        ordersDiv.innerHTML = '';
+        displayOrderDetails(newOrders, userLoggedIn.email);
+    });
 
     await displayOrderDetails(orders, userLoggedIn.email);
 });
